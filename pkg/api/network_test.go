@@ -73,7 +73,8 @@ func TestCanListNetworks(t *testing.T) {
 				db.AssertExpectations(t)
 				assert.Equal(t, http.StatusOK, w.Code)
 				n := &types.NetworkListResponse{}
-				json.NewDecoder(w.Body).Decode(n)
+				err := json.NewDecoder(w.Body).Decode(n)
+				require.NoError(t, err)
 				assert.Equal(t, 2, len(n.Items))
 				assert.Equal(t, "10.0.0.0/16", n.Items[0].CIDR)
 				assert.Equal(t, "10.1.0.0/16", n.Items[1].CIDR)
@@ -100,7 +101,7 @@ func TestCanCreateNetwork(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("{\"id\":\"123456789012\",\"statusCode\":201}"))
+		_, _ = w.Write([]byte("{\"id\":\"123456789012\",\"statusCode\":201}"))
 	}))
 
 	tests := []struct {
@@ -171,7 +172,8 @@ func TestCanCreateNetwork(t *testing.T) {
 				db.AssertExpectations(t)
 				assert.Equal(t, http.StatusCreated, w.Code)
 				n := &types.NetworkResponse{}
-				json.NewDecoder(w.Body).Decode(n)
+				err := json.NewDecoder(w.Body).Decode(n)
+				require.NoError(t, err)
 				assert.Equal(t, "1234", n.Network.Account)
 				assert.Equal(t, "us-east-1", n.Network.Region)
 				assert.Equal(t, "aws", n.Network.Provider)
