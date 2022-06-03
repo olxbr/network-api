@@ -5,3 +5,4 @@ deployment/azure-provider
 deployment/network-api
 packaged.yaml
 packaged-provider.yaml
+!.github/*
