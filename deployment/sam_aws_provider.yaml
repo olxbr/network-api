@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Description: AWS Network Webhook Provider
+
+Parameters:
+  BucketName:
+    Type: String
+    Default: napi-templates
+    Descript: Bucket for Cloudformation templates storage
+  TrustRoleName:
+    Type: String
+    Default: NetworkProvider
+    Description: Cross account role name
+
+Resources:
+  TemplatesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+
+  WebhookSignKey:
+    Type: AWS::KMS::Key
+    Properties:
+      KeySpec: RSA_3072
+      KeyUsage: SIGN_VERIFY
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: key-default-1
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+
+  NetworkProviderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: default
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "kms:Verify"
+                Resource:
+                  - !GetAtt WebhookSignKey.Arn
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                  - s3:GetObjectVersion
+                  - s3:GetLifecycleConfiguration
+                Resource:
+                  - !Sub "${TemplatesBucket.Arn}"
+                  - !Sub "${TemplatesBucket.Arn}/*"
+
+  NetworkWebhook:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: go1.x
+      Handler: aws-provider
+      Timeout: 300
+      Environment:
+        Variables:
+          CF_REPOSITORY: !Join
+            - ""
+            - - "https://"
+              - !GetAtt TemplatesBucket.DomainName
+          SIGNING_KEY: !Ref WebhookSignKey
+          TRUST_ROLE: !Ref TrustRoleName
+      AutoPublishAlias: live
+      FunctionUrlConfig:
+        AuthType: NONE
+      Role: !GetAtt NetworkProviderRole.Arn
+
+Outputs:
+  AWSNetworkProviderRole:
+    Value: !Ref NetworkProviderRole

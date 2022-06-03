@@ -1,0 +1,230 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Description: Network API
+
+Parameters:
+  VpcId:
+    Type: String
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+  # NetworkAPISecurityGroup:
+  #   Type: AWS::EC2::SecurityGroup
+  #   Properties:
+  #     VpcId: !Ref VpcId
+  #     GroupDescription: Allows access over 443
+  #     SecurityGroupIngress:
+  #       - IpProtocol: "tcp"
+  #         FromPort: 443
+  #         ToPort: 443
+  #         CidrIp: 0.0.0.0/0
+
+  # NetworkAPIVPCEndpoint:
+  #   Type: AWS::EC2::VPCEndpoint
+  #   Properties:
+  #     VpcId: !Ref VpcId
+  #     ServiceName: !Sub "com.amazonaws.${AWS::Region}.execute-api"
+  #     VpcEndpointType: Interface
+  #     PrivateDnsEnabled: true
+  #     SubnetIds: !Ref SubnetIds
+  #     SecurityGroupIds:
+  #       - !Ref NetworkAPISecurityGroup
+
+  NetworkSecrets:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Network Secrets
+      Name: napi_secrets
+      SecretString: "{}"
+
+  NetworkAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: network-api
+      StageName: prod
+      # EndpointConfiguration:
+      #   Type: PRIVATE
+      #   VPCEndpointIds:
+      #     - !Ref NetworkAPIVPCEndpoint
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: "../api/network-api.yaml"
+
+  NetworkFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: go1.x
+      Handler: network-api
+      Timeout: 120
+      Environment:
+        Variables:
+          SecretsARN: !Ref NetworkSecrets
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref NetworkTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PoolTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProviderTable
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "secretsmanager:DescribeSecret"
+                - "secretsmanager:GetSecretValue"
+                - "secretsmanager:PutSecretValue"
+                - "secretsmanager:UpdateSecret"
+                - "secretsmanager:UpdateSecretVersionStage"
+              Resource: !Ref NetworkSecrets
+      Events:
+        RootHandler:
+          Type: Api
+          Properties:
+            Path: "/"
+            Method: get
+            RestApiId: !Ref NetworkAPI
+        ListNetworks:
+          Type: Api
+          Properties:
+            Path: "/api/v1/networks"
+            Method: get
+            RestApiId: !Ref NetworkAPI
+        CreateNetwork:
+          Type: Api
+          Properties:
+            Path: "/api/v1/networks"
+            Method: post
+            RestApiId: !Ref NetworkAPI
+        DetailNetwork:
+          Type: Api
+          Properties:
+            Path: "/api/v1/networks/{id}"
+            Method: get
+            RestApiId: !Ref NetworkAPI
+        UpdateNetwork:
+          Type: Api
+          Properties:
+            Path: "/api/v1/networks/{id}"
+            Method: put
+            RestApiId: !Ref NetworkAPI
+        DeleteNetwork:
+          Type: Api
+          Properties:
+            Path: "/api/v1/networks/{id}"
+            Method: delete
+            RestApiId: !Ref NetworkAPI
+        SubnetsNetwork:
+          Type: Api
+          Properties:
+            Path: "/api/v1/networks/{id}/subnets"
+            Method: get
+            RestApiId: !Ref NetworkAPI
+
+        ListPools:
+          Type: Api
+          Properties:
+            Path: "/api/v1/pools"
+            Method: get
+            RestApiId: !Ref NetworkAPI
+        CreatePool:
+          Type: Api
+          Properties:
+            Path: "/api/v1/pools"
+            Method: post
+            RestApiId: !Ref NetworkAPI
+        DetailPool:
+          Type: Api
+          Properties:
+            Path: "/api/v1/pools/{id}"
+            Method: get
+            RestApiId: !Ref NetworkAPI
+        DeletePool:
+          Type: Api
+          Properties:
+            Path: "/api/v1/pools/{id}"
+            Method: delete
+            RestApiId: !Ref NetworkAPI
+
+        ListProviders:
+          Type: Api
+          Properties:
+            Path: "/api/v1/providers"
+            Method: get
+            RestApiId: !Ref NetworkAPI
+        CreateProvider:
+          Type: Api
+          Properties:
+            Path: "/api/v1/providers"
+            Method: post
+            RestApiId: !Ref NetworkAPI
+        DetailProvider:
+          Type: Api
+          Properties:
+            Path: "/api/v1/providers/{id}"
+            Method: get
+            RestApiId: !Ref NetworkAPI
+        DeleteProvider:
+          Type: Api
+          Properties:
+            Path: "/api/v1/providers/{id}"
+            Method: delete
+            RestApiId: !Ref NetworkAPI
+
+  NetworkTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: napi_networks
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 2
+
+  PoolTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: napi_pools
+      AttributeDefinitions:
+        - AttributeName: region
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: region
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 1
+
+  ProviderTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: napi_providers
+      AttributeDefinitions:
+        - AttributeName: name
+          AttributeType: S
+      KeySchema:
+        - AttributeName: name
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 1
+
+Outputs:
+  Endpoint:
+    Value: !Sub "https://${NetworkAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/"

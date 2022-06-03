@@ -1,0 +1,204 @@
+openapi: "3.0.1"
+info:
+  title: "Network API"
+  version: "2022-04-07"
+paths:
+  /:
+    get:
+      responses:
+        "200":
+          description: "Network API info"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+  /api/v1/networks:
+    get:
+      responses:
+        "200":
+          description: "List Networks"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+    post:
+      responses:
+        "201":
+          description: "Created"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+        "500":
+          description: "Error"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+  /api/v1/networks/{id}:
+    get:
+      responses:
+        "200":
+          description: "Network information"
+        "404":
+          description: "Network not found"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+    put:
+      responses:
+        "200":
+          description: "updated"
+        "500":
+          description: "error"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+    delete:
+      responses:
+        "200":
+          description: "deleted"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+  /api/v1/networks/{id}/subnets:
+    get:
+      responses:
+        "200":
+          description: "network subnets"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+  /api/v1/pools:
+    get:
+      responses:
+        "200":
+          description: "List Pools"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+    post:
+      responses:
+        "201":
+          description: "Created"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+        "500":
+          description: "Error"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+  /api/v1/pools/{id}:
+    get:
+      responses:
+        "200":
+          description: "Pool information"
+        "404":
+          description: "Pool not found"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+    delete:
+      responses:
+        "200":
+          description: "deleted"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+  /api/v1/providers:
+    get:
+      responses:
+        "200":
+          description: "List Providers"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+    post:
+      responses:
+        "201":
+          description: "Created"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+        "500":
+          description: "Error"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+  /api/v1/providers/{id}:
+    get:
+      responses:
+        "200":
+          description: "Provider information"
+        "404":
+          description: "Provider not found"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+    put:
+      responses:
+        "200":
+          description: "updated"
+        "500":
+          description: "error"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
+    delete:
+      responses:
+        "200":
+          description: "deleted"
+      x-amazon-apigateway-integration:
+        httpMethod: post
+        type: aws_proxy
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NetworkFunction.Arn}/invocations
+
