@@ -14,13 +14,17 @@ import (
 
 type api struct {
 	Router  *mux.Router
-	Secrets *secret.Secrets
+	Secrets secret.Secrets
 	DB      db.Database
 }
 
 var validate *validator.Validate
 
-func New(database db.Database, s *secret.Secrets) *api {
+func init() {
+	validate = validator.New()
+}
+
+func New(database db.Database, s secret.Secrets) *api {
 	r := mux.NewRouter()
 	a := &api{
 		Router:  r,
@@ -29,10 +33,6 @@ func New(database db.Database, s *secret.Secrets) *api {
 	}
 	a.RegisterRoutes()
 	return a
-}
-
-func NewValidator() {
-	validate = validator.New()
 }
 
 func (a *api) RegisterRoutes() {

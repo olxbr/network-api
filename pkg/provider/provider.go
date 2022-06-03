@@ -16,7 +16,7 @@ import (
 
 type ProviderManager struct {
 	d db.Database
-	s *secret.Secrets
+	s secret.Secrets
 }
 
 type ProviderClient struct {
@@ -25,7 +25,7 @@ type ProviderClient struct {
 	url  string
 }
 
-func New(database db.Database, s *secret.Secrets) *ProviderManager {
+func New(database db.Database, s secret.Secrets) *ProviderManager {
 	return &ProviderManager{
 		d: database,
 		s: s,

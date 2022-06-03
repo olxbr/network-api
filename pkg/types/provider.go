@@ -42,6 +42,6 @@ type ProviderWebhook struct {
 }
 
 type ProviderWebhookResponse struct {
-	StatusCode int
-	ID         string
+	StatusCode int    `json:"statusCode"`
+	ID         string `json:"id"`
 }

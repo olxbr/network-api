@@ -8,21 +8,26 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 )
 
-type Secrets struct {
+type secrets struct {
 	Client    *secretsmanager.Client
 	SecretArn string
 }
 
+type Secrets interface {
+	PutAPIToken(ctx context.Context, provider, token string) error
+	GetAPIToken(ctx context.Context, provider string) (string, error)
+}
+
 type SecretStorage map[string]string
 
-func New(cli *secretsmanager.Client, arn string) *Secrets {
-	return &Secrets{
+func New(cli *secretsmanager.Client, arn string) Secrets {
+	return &secrets{
 		Client:    cli,
 		SecretArn: arn,
 	}
 }
 
-func (s *Secrets) PutAPIToken(ctx context.Context, provider, token string) error {
+func (s *secrets) PutAPIToken(ctx context.Context, provider, token string) error {
 	so, err := s.Client.GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
 		SecretId: aws.String(s.SecretArn),
 	})
@@ -51,7 +56,7 @@ func (s *Secrets) PutAPIToken(ctx context.Context, provider, token string) error
 	return err
 }
 
-func (s *Secrets) GetAPIToken(ctx context.Context, provider string) (string, error) {
+func (s *secrets) GetAPIToken(ctx context.Context, provider string) (string, error) {
 	so, err := s.Client.GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
 		SecretId: aws.String(s.SecretArn),
 	})

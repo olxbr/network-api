@@ -25,7 +25,8 @@ build:
 	go build -o ./bin/network-api ${GO_LDFLAGS} ./cmd/network-api
 
 mocks:
-	cd pkg/db && mockery --all --output fake --outpkg fake
+	cd pkg/db && mockery --all --output fake --outpkg fake --case underscore
+	cd pkg/secret && mockery --all --output fake --outpkg fake --case underscore
 
 run:
 	sam local start-api

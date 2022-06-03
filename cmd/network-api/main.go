@@ -30,6 +30,5 @@ func main() {
 	d := db.New(dynamoClient)
 	s := secret.New(secretsClient, secretsArn)
 	mux := api.New(d, s)
-	api.NewValidator()
 	lambda.Start(httpadapter.New(mux.GetHandler()).ProxyWithContext)
 }
