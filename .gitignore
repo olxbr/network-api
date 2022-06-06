@@ -1,0 +1,8 @@
+.aws-sam/
+bin/
+deployment/aws-provider
+deployment/azure-provider
+deployment/network-api
+packaged.yaml
+packaged-provider.yaml
+!.github/*
