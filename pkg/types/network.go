@@ -34,7 +34,7 @@ type NetworkRequest struct {
 
 	Info string `json:"info,omitempty" validate:"omitempty"`
 
-	SubnetSize int `json:"subnetSize" validate:"required,max=24,min=16"`
+	SubnetSize int `json:"subnetSize" validate:"required_without_all=Reserved Legacy,omitempty,max=24,min=16"`
 
 	AttachTGW     *bool `json:"attachTGW,omitempty" validate:"required"`
 	PrivateSubnet *bool `json:"privateSubnet,omitempty" validate:"required"`
@@ -42,7 +42,7 @@ type NetworkRequest struct {
 	Legacy        *bool `json:"legacy,omitempty" validate:"omitempty"`
 
 	Reserved *bool  `json:"reserved,omitempty" validate:"omitempty"`
-	CIDR     string `json:"cidr,omitempty" validate:"excluded_without=Reserved,omitempty,cidr"`
+	CIDR     string `json:"cidr,omitempty" validate:"excluded_without_all=Reserved Legacy,omitempty,cidr"`
 }
 
 type NetworkResponse struct {

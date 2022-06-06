@@ -19,7 +19,7 @@ lint:
 ifneq (${GOLANG_LINT_VERSION}, ${GOLANGLINT_INSTALLED_VERSION})
 	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v${GOLANG_LINT_VERSION}
 endif
-	golangci-lint run
+	golangci-lint run --go=1.17
 
 build:
 	go build -o ./bin/network-api ${GO_LDFLAGS} ./cmd/network-api

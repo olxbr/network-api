@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -68,11 +69,15 @@ func (a *api) CreateNetwork(w http.ResponseWriter, r *http.Request) {
 	if nr.PublicSubnet != nil {
 		n.PublicSubnet = types.ToBool(nr.PublicSubnet)
 	}
+
 	if nr.Legacy != nil {
 		n.Legacy = types.ToBool(nr.Legacy)
 	}
+	if nr.Reserved != nil {
+		n.Reserved = types.ToBool(nr.Reserved)
+	}
 
-	if (nr.Reserved != nil && *nr.Reserved) || (nr.Legacy != nil && *nr.Legacy) {
+	if n.Reserved || n.Legacy {
 		ipprefix, err := netaddr.ParseIPPrefix(nr.CIDR)
 		if err != nil {
 			writeError(w, err, http.StatusBadRequest)
@@ -85,8 +90,6 @@ func (a *api) CreateNetwork(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		n.CIDR = ipprefix.String()
-		n.Reserved = *nr.Reserved
-		n.Legacy = *nr.Legacy
 	} else {
 		ipprefix, err := nm.AllocateNetwork(ctx, nr.Region, uint8(nr.SubnetSize))
 		if err != nil {
@@ -188,6 +191,10 @@ func (a *api) GenerateSubnets(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeError(w, err, http.StatusInternalServerError)
 		return
+	}
+
+	if n.Reserved || n.Legacy {
+		writeError(w, errors.New("cannot generate subnets for reserved or legacy networks"), http.StatusBadRequest)
 	}
 
 	snets, err := net.GenerateSubnets(n)
