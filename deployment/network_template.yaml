@@ -1,0 +1,408 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: "Creates a VPC with Managed NAT, similar to the VPC Wizard at https://console.aws.amazon.com/vpc/home#wizardFullpagePublicAndPrivate: (extended from VPC_with_PublicIPs_And_DNS.template sample)"
+Parameters:
+  VPCName:
+    Description: The name of the VPC being created.
+    Type: String
+    Default: "corp"
+  Environment:
+    Description: "The VPC environment. Values: prod or qa"
+    Type: String
+    AllowedValues:
+      - prod
+      - qa
+  VPCCidr:
+    Description: "The CIDR of the VPC being created. Example: 10.0.0.0/16"
+    Type: String
+  PublicSubnet0Cidr:
+    Description: "The CIDR of the public subnet being created. Example: 10.0.0.0/16"
+    Type: String
+  PublicSubnet1Cidr:
+    Description: "The CIDR of the public subnet being created. Example: 10.0.0.0/16"
+    Type: String
+  PublicSubnet2Cidr:
+    Description: "The CIDR of the public subnet being created. Example: 10.0.0.0/16"
+    Type: String
+  PrivateSubnet0Cidr:
+    Description: "The CIDR of the private subnet being created. Example: 10.0.0.0/16"
+    Type: String
+  PrivateSubnet1Cidr:
+    Description: "The CIDR of the private subnet being created. Example: 10.0.0.0/16"
+    Type: String
+  PrivateSubnet2Cidr:
+    Description: "The CIDR of the private subnet being created. Example: 10.0.0.0/16"
+    Type: String
+  TGWSubnet0Cidr:
+    Description: "The CIDR of the TGW Attachment subnet being created. Example: 10.0.0.0/16"
+    Type: String
+  TGWSubnet1Cidr:
+    Description: "The CIDR of the TGW Attachment subnet being created. Example: 10.0.0.0/16"
+    Type: String
+  TGWSubnet2Cidr:
+    Description: "The CIDR of the TGW Attachment subnet being created. Example: 10.0.0.0/16"
+    Type: String
+
+Mappings:
+  AZRegions:
+    us-east-1:
+      AZs: ["a", "b", "c"]
+
+Resources:
+  VPC:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      EnableDnsSupport: "true"
+      EnableDnsHostnames: "true"
+      CidrBlock: !Ref VPCCidr
+      Tags:
+        - Key: "Name"
+          Value: !Ref "VPCName"
+
+  PublicSubnet0:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      AvailabilityZone:
+        Fn::Sub:
+          - "${AWS::Region}${AZ}"
+          - AZ: !Select [0, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+      CidrBlock: !Ref PublicSubnet0Cidr
+      MapPublicIpOnLaunch: "true"
+      Tags:
+        - Key: "Network"
+          Value: "Public"
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-public-"
+              - !Select [0, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+
+  PublicSubnet1:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      AvailabilityZone:
+        Fn::Sub:
+          - "${AWS::Region}${AZ}"
+          - AZ: !Select [1, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+      CidrBlock: !Ref PublicSubnet1Cidr
+      MapPublicIpOnLaunch: "true"
+      Tags:
+        - Key: "Network"
+          Value: "Public"
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-public-"
+              - !Select [1, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+
+  PublicSubnet2:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      AvailabilityZone:
+        Fn::Sub:
+          - "${AWS::Region}${AZ}"
+          - AZ: !Select [2, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+      CidrBlock: !Ref PublicSubnet2Cidr
+      MapPublicIpOnLaunch: "true"
+      Tags:
+        - Key: "Network"
+          Value: "Public"
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-public-"
+              - !Select [2, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+
+  PrivateSubnet0:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      AvailabilityZone:
+        Fn::Sub:
+          - "${AWS::Region}${AZ}"
+          - AZ: !Select [0, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+      CidrBlock: !Ref PrivateSubnet0Cidr
+      MapPublicIpOnLaunch: "false"
+      Tags:
+        - Key: "Network"
+          Value: "Private"
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-private-"
+              - !Select [0, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+
+  PrivateSubnet1:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      AvailabilityZone:
+        Fn::Sub:
+          - "${AWS::Region}${AZ}"
+          - AZ: !Select [1, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+      CidrBlock: !Ref PrivateSubnet1Cidr
+      MapPublicIpOnLaunch: "false"
+      Tags:
+        - Key: "Network"
+          Value: "Private"
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-private-"
+              - !Select [1, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+
+  PrivateSubnet2:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      AvailabilityZone:
+        Fn::Sub:
+          - "${AWS::Region}${AZ}"
+          - AZ: !Select [2, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+      CidrBlock: !Ref PrivateSubnet2Cidr
+      MapPublicIpOnLaunch: "false"
+      Tags:
+        - Key: "Network"
+          Value: "Private"
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-private-"
+              - !Select [2, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+
+  TGWAttachSubnet0:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      AvailabilityZone:
+        Fn::Sub:
+          - "${AWS::Region}${AZ}"
+          - AZ: !Select [0, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+      CidrBlock: !Ref TGWSubnet0Cidr
+      MapPublicIpOnLaunch: "false"
+      Tags:
+        - Key: "Network"
+          Value: "Private"
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-tgw-attachment-"
+              - !Select [0, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+
+  TGWAttachSubnet1:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      AvailabilityZone:
+        Fn::Sub:
+          - "${AWS::Region}${AZ}"
+          - AZ: !Select [1, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+      CidrBlock: !Ref TGWSubnet1Cidr
+      MapPublicIpOnLaunch: "false"
+      Tags:
+        - Key: "Network"
+          Value: "Private"
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-tgw-attachment-"
+              - !Select [1, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+
+  TGWAttachSubnet2:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      AvailabilityZone:
+        Fn::Sub:
+          - "${AWS::Region}${AZ}"
+          - AZ: !Select [2, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+      CidrBlock: !Ref TGWSubnet2Cidr
+      MapPublicIpOnLaunch: "false"
+      Tags:
+        - Key: "Network"
+          Value: "Private"
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-tgw-attachment-"
+              - !Select [2, !FindInMap ["AZRegions", !Ref "AWS::Region", "AZs"]]
+
+  InternetGateway:
+    Type: "AWS::EC2::InternetGateway"
+    Properties:
+      Tags:
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-IGW"
+
+  GatewayToInternet:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      InternetGatewayId:
+        Ref: "InternetGateway"
+
+  PublicRouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      Tags:
+        - Key: "Network"
+          Value: "Public"
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-public-route-table"
+
+  PublicRoute:
+    Type: "AWS::EC2::Route"
+    DependsOn: "GatewayToInternet"
+    Properties:
+      RouteTableId:
+        Ref: "PublicRouteTable"
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId:
+        Ref: "InternetGateway"
+
+  PublicSubnetRouteTableAssociation0:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "PublicSubnet0"
+      RouteTableId:
+        Ref: "PublicRouteTable"
+
+  PublicSubnetRouteTableAssociation1:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "PublicSubnet1"
+      RouteTableId:
+        Ref: "PublicRouteTable"
+
+  PublicSubnetRouteTableAssociation2:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "PublicSubnet2"
+      RouteTableId:
+        Ref: "PublicRouteTable"
+
+  ElasticIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: "vpc"
+
+  NATGateway:
+    Type: "AWS::EC2::NatGateway"
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - "ElasticIP"
+          - "AllocationId"
+      SubnetId:
+        Ref: "PublicSubnet2"
+
+  PrivateRouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      Tags:
+        - Key: "Name"
+          Value: !Join
+            - ""
+            - - !Ref "VPCName"
+              - "-private-route-table"
+
+  PrivateRouteToInternet:
+    Type: "AWS::EC2::Route"
+    DependsOn: "NATGateway"
+    Properties:
+      RouteTableId:
+        Ref: "PrivateRouteTable"
+      DestinationCidrBlock: "0.0.0.0/0"
+      NatGatewayId:
+        Ref: "NATGateway"
+
+  PrivateSubnetRouteTableAssociation0:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "PrivateSubnet0"
+      RouteTableId:
+        Ref: "PrivateRouteTable"
+
+  PrivateSubnetRouteTableAssociation1:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "PrivateSubnet1"
+      RouteTableId:
+        Ref: "PrivateRouteTable"
+
+  PrivateSubnetRouteTableAssociation2:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "PrivateSubnet2"
+      RouteTableId:
+        Ref: "PrivateRouteTable"
+
+  TGWSubnetRouteTableAssociation0:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "TGWAttachSubnet0"
+      RouteTableId:
+        Ref: "PrivateRouteTable"
+
+  TGWSubnetRouteTableAssociation1:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "TGWAttachSubnet1"
+      RouteTableId:
+        Ref: "PrivateRouteTable"
+
+  TGWSubnetRouteTableAssociation2:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "TGWAttachSubnet2"
+      RouteTableId:
+        Ref: "PrivateRouteTable"
+
+  EndpointS3:
+    Type: "AWS::EC2::VPCEndpoint"
+    Properties:
+      RouteTableIds:
+        - !Ref "PrivateRouteTable"
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      VpcId: !Ref VPC
