@@ -6,3 +6,4 @@ deployment/network-api
 packaged.yaml
 packaged-provider.yaml
 
+!.github/*
