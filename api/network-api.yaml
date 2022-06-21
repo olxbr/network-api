@@ -8,6 +8,8 @@ paths:
       responses:
         "200":
           description: "Network API info"
+      security:
+        - MyLambdaAuthUpdated: []
       x-amazon-apigateway-integration:
         httpMethod: post
         type: aws_proxy

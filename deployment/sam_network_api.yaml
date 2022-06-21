@@ -10,6 +10,19 @@ Parameters:
   SubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
 
+  OIDCScopes:
+    Type: String
+    Default: "openid, profile"
+
+  OIDCAudience:
+    Type: String
+
+  OIDCIssuer:
+    Type: String
+
+  OIDCJwksURL:
+    Type: String
+
 Resources:
   # NetworkAPISecurityGroup:
   #   Type: AWS::EC2::SecurityGroup
@@ -49,11 +62,31 @@ Resources:
       #   Type: PRIVATE
       #   VPCEndpointIds:
       #     - !Ref NetworkAPIVPCEndpoint
+      Auth:
+        Authorizers:
+          NetworkAPIOIDCAuthorizer:
+            FunctionArn:
+              Fn::GetAtt:
+                - NetworkAPIAuthFunction
+                - Arn
+        DefaultAuthorizer: NetworkAPIOIDCAuthorizer
       DefinitionBody:
         Fn::Transform:
           Name: AWS::Include
           Parameters:
             Location: "../api/network-api.yaml"
+
+  NetworkAPIAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: go1.x
+      Handler: jwt-authorizer
+      Environment:
+        Variables:
+          OIDC_ISSUER: !Ref OIDCIssuer
+          OIDC_SCOPES: !Ref OIDCScopes
+          OIDC_AUDIENCE: !Ref OIDCAudience
+          OIDC_JWKS_URL: !Ref OIDCJwksURL
 
   NetworkFunction:
     Type: AWS::Serverless::Function

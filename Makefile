@@ -35,13 +35,18 @@ clean:
 	rm -rf ./bin/*
 	rm -f deployment/aws-provider
 	rm -f deployment/network-api
+	rm -f deployment/jwt-authorizer
 
 package: clean
 	GOARCH=amd64 GOOS=linux go build -o deployment/network-api ${GO_LDFLAGS} ./cmd/network-api
+	GOARCH=amd64 GOOS=linux go build -o deployment/jwt-authorizer ${GO_LDFLAGS} ./cmd/jwt-authorizer
 	sam package --template-file deployment/sam_network_api.yaml --s3-bucket network-api-sam --output-template-file packaged.yaml
 
 deploy:
+	set -e ; \
+	SAM_PARAMETERS=$$(cat parameters.json | jq -r '[ .[] | "\(.ParameterKey)=\(.ParameterValue)" ] | join(" ")' ) ; \
 	sam deploy --template-file packaged.yaml --stack-name network-api-sam \
+	--parameter-overrides $$SAM_PARAMETERS \
 	--capabilities CAPABILITY_IAM
 
 package_provider: clean

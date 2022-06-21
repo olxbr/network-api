@@ -76,7 +76,35 @@ sam local start-api
 
 ## Deploy
 
-ToDo
+parameters.json:
+```
+[
+    {
+        "ParameterKey": "VpcId",
+        "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "SubnetIds",
+        "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "OIDCAudience",
+        "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "OIDCIssuer",
+        "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "OIDCScopes",
+        "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "OIDCJwksURL",
+        "ParameterValue": ""
+    }
+]
+```
 
 ## Configuring
 
