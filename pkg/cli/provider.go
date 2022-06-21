@@ -11,10 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newNetworkCommand() *cobra.Command {
-	networkCmd := &cobra.Command{
-		Use:   "network",
-		Short: "Network operations",
+func newProviderCommand() *cobra.Command {
+	providerCmd := &cobra.Command{
+		Use:   "provider",
+		Short: "Provider operations",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := LoadConfig()
 			if err != nil {
@@ -50,21 +50,19 @@ func newNetworkCommand() *cobra.Command {
 		},
 	}
 
-	networkCmd.AddCommand(networkAddCmd())
-	networkCmd.AddCommand(networkRemoveCmd)
-	networkCmd.AddCommand(networkListCmd)
+	providerCmd.AddCommand(providerAddCmd())
+	providerCmd.AddCommand(providerRemoveCmd)
+	providerCmd.AddCommand(providerListCmd)
 
-	return networkCmd
+	return providerCmd
 }
 
-func networkAddCmd() *cobra.Command {
-	req := &types.NetworkRequest{}
-	var AttachTGW bool
-	var PrivateSubnet bool
-	var PublicSubnet bool
+func providerAddCmd() *cobra.Command {
+	req := &types.ProviderRequest{}
+
 	c := &cobra.Command{
 		Use:   "add",
-		Short: "Creates a new network",
+		Short: "Adds a new provider",
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
 			cli, ok := client.ClientFromContext(ctx)
@@ -73,11 +71,7 @@ func networkAddCmd() *cobra.Command {
 				return
 			}
 
-			req.AttachTGW = types.Bool(AttachTGW)
-			req.PrivateSubnet = types.Bool(PrivateSubnet)
-			req.PublicSubnet = types.Bool(PublicSubnet)
-
-			n, err := cli.CreateNetwork(ctx, req)
+			n, err := cli.CreateProvider(ctx, req)
 			if err != nil {
 				log.Printf("error creating network: %+v", err)
 				return
@@ -88,19 +82,14 @@ func networkAddCmd() *cobra.Command {
 	}
 
 	f := c.Flags()
-	f.StringVar(&req.Provider, "provider", "", "Provider")
-	f.StringVar(&req.Account, "account", "", "Account")
-	f.StringVar(&req.Region, "region", "", "Region")
-	f.StringVarP(&req.Environment, "environment", "e", "", "Environment")
-	f.IntVar(&req.SubnetSize, "subnet", 0, "subnet")
-	f.BoolVar(&AttachTGW, "transit-gateway", true, "Attach transit gateway")
-	f.BoolVar(&PrivateSubnet, "private", true, "Private subnet")
-	f.BoolVar(&PublicSubnet, "public", true, "Public subnet")
+	f.StringVar(&req.Name, "name", "", "Name")
+	f.StringVar(&req.WebhookURL, "url", "", "Webhook URL")
+	f.StringVar(&req.APIToken, "token", "", "API Token")
 
 	return c
 }
 
-var networkRemoveCmd = &cobra.Command{
+var providerRemoveCmd = &cobra.Command{
 	Use:   "remove",
 	Short: "Configure remote endpoint",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -108,7 +97,7 @@ var networkRemoveCmd = &cobra.Command{
 	},
 }
 
-var networkListCmd = &cobra.Command{
+var providerListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "Configure remote endpoint",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -118,25 +107,19 @@ var networkListCmd = &cobra.Command{
 			log.Printf("error retriving client")
 			return
 		}
-		ns, err := cli.ListNetworks(ctx)
+		ps, err := cli.ListProviders(ctx)
 		if err != nil {
 			log.Printf("Error: %s", err)
 			return
 		}
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Provider", "Account", "Region", "Environment", "CIDR", "VpcID", "Info"})
+		table.SetHeader([]string{"Provider", "URL"})
 
-		for _, n := range ns {
+		for _, p := range ps.Items {
 			table.Append([]string{
-				n.ID.String(),
-				n.Provider,
-				n.Account,
-				n.Region,
-				n.Environment,
-				n.CIDR,
-				n.VpcID,
-				n.Info,
+				p.Name,
+				p.WebhookURL,
 			})
 		}
 

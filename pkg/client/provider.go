@@ -10,8 +10,8 @@ import (
 	"github.com/olxbr/network-api/pkg/types"
 )
 
-func (c *Client) ListNetworks(ctx context.Context) ([]*types.Network, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseUrl("api/v1/networks"), nil)
+func (c *Client) ListProviders(ctx context.Context) (*types.ProviderResponse, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseUrl("api/v1/providers"), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -23,22 +23,22 @@ func (c *Client) ListNetworks(ctx context.Context) ([]*types.Network, error) {
 	defer resp.Body.Close()
 	d := json.NewDecoder(resp.Body)
 
-	var list types.NetworkListResponse
-	if err := d.Decode(&list); err != nil {
+	p := &types.ProviderResponse{}
+	if err := d.Decode(p); err != nil {
 		return nil, err
 	}
 
-	return list.Items, nil
+	return p, nil
 }
 
-func (c *Client) CreateNetwork(ctx context.Context, r *types.NetworkRequest) (*types.NetworkResponse, error) {
+func (c *Client) CreateProvider(ctx context.Context, r *types.ProviderRequest) (*types.Provider, error) {
 	buf := &bytes.Buffer{}
 	e := json.NewEncoder(buf)
 	if err := e.Encode(r); err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseUrl("api/v1/networks"), buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseUrl("api/v1/providers"), buf)
 	if err != nil {
 		return nil, err
 	}
@@ -57,10 +57,10 @@ func (c *Client) CreateNetwork(ctx context.Context, r *types.NetworkRequest) (*t
 		return nil, fmt.Errorf("request failed %d: %+v", resp.StatusCode, e)
 	}
 
-	n := &types.NetworkResponse{}
-	if err := d.Decode(n); err != nil {
+	p := &types.Provider{}
+	if err := d.Decode(p); err != nil {
 		return nil, err
 	}
 
-	return n, nil
+	return p, nil
 }

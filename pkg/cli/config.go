@@ -144,7 +144,10 @@ func newConfigCommand() *cobra.Command {
 				cfg.Scopes = a.Scopes
 			}
 
-			cfg.Save()
+			err = cfg.Save()
+			if err != nil {
+				log.Printf("Failed saving config: %+v", err)
+			}
 		},
 	}
 

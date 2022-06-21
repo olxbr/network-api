@@ -50,6 +50,7 @@ func newRootCmd() *cobra.Command {
 func NewRunner() *Runner {
 	rootCmd := newRootCmd()
 	rootCmd.AddCommand(newNetworkCommand())
+	rootCmd.AddCommand(newProviderCommand())
 	rootCmd.AddCommand(newConfigCommand())
 	return &Runner{
 		root: rootCmd,
