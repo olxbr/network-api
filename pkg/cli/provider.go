@@ -3,7 +3,6 @@ package cli
 import (
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/olxbr/network-api/pkg/client"
@@ -22,30 +21,11 @@ func newProviderCommand() *cobra.Command {
 				return err
 			}
 			ctx := cmd.Context()
-			cmd.SetContext(WithConfig(ctx, cfg))
-			path := filepath.Join(os.Getenv("HOME"), configPathDefault)
-			auth, err := client.NewOAuth2Authorizer(&client.OAuth2AuthorizerOptions{
-				ClientID: cfg.ClientID,
-				Issuer:   cfg.IssuerURL,
-				Scopes:   cfg.Scopes,
-				TokenDir: path,
-			})
+			ctx, err = SetupClientContext(WithConfig(ctx, cfg), cfg)
 			if err != nil {
-				log.Printf("error: %+v", err)
 				return err
 			}
-			defer auth.Close()
-			t, err := auth.GetToken(ctx)
-			if err != nil {
-				log.Printf("error: %+v", err)
-				return err
-			}
-			httpClient := auth.NewClient(ctx, t)
-
-			cmd.SetContext(client.WithNewClient(ctx, &client.ClientOptions{
-				Endpoint: cfg.Endpoint,
-				Client:   httpClient,
-			}))
+			cmd.SetContext(ctx)
 			return nil
 		},
 	}
@@ -63,6 +43,7 @@ func providerAddCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "add",
 		Short: "Adds a new provider",
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
 			cli, ok := client.ClientFromContext(ctx)
@@ -70,6 +51,8 @@ func providerAddCmd() *cobra.Command {
 				log.Printf("error retriving client")
 				return
 			}
+
+			req.Name = args[0]
 
 			n, err := cli.CreateProvider(ctx, req)
 			if err != nil {
@@ -82,7 +65,6 @@ func providerAddCmd() *cobra.Command {
 	}
 
 	f := c.Flags()
-	f.StringVar(&req.Name, "name", "", "Name")
 	f.StringVar(&req.WebhookURL, "url", "", "Webhook URL")
 	f.StringVar(&req.APIToken, "token", "", "API Token")
 

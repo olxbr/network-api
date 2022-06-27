@@ -51,6 +51,7 @@ func NewRunner() *Runner {
 	rootCmd := newRootCmd()
 	rootCmd.AddCommand(newNetworkCommand())
 	rootCmd.AddCommand(newProviderCommand())
+	rootCmd.AddCommand(newPoolCommand())
 	rootCmd.AddCommand(newConfigCommand())
 	return &Runner{
 		root: rootCmd,

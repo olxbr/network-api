@@ -22,6 +22,13 @@ func (c *Client) ListNetworks(ctx context.Context) ([]*types.Network, error) {
 
 	defer resp.Body.Close()
 	d := json.NewDecoder(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		e := &types.ErrorResponse{}
+		if err := d.Decode(e); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("request failed %d: %+v", resp.StatusCode, e)
+	}
 
 	var list types.NetworkListResponse
 	if err := d.Decode(&list); err != nil {
@@ -29,6 +36,35 @@ func (c *Client) ListNetworks(ctx context.Context) ([]*types.Network, error) {
 	}
 
 	return list.Items, nil
+}
+
+func (c *Client) DetailNetwork(ctx context.Context, id string) (*types.Network, error) {
+	url := c.baseUrl("api/v1/networks/" + id)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	d := json.NewDecoder(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		e := &types.ErrorResponse{}
+		if err := d.Decode(e); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("request failed %d: %+v", resp.StatusCode, e)
+	}
+
+	n := &types.Network{}
+	if err := d.Decode(n); err != nil {
+		return nil, err
+	}
+
+	return n, nil
 }
 
 func (c *Client) CreateNetwork(ctx context.Context, r *types.NetworkRequest) (*types.NetworkResponse, error) {

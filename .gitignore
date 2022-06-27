@@ -3,6 +3,7 @@ bin/
 deployment/aws-provider
 deployment/azure-provider
 deployment/network-api
+deployment/jwt-authorizer
 packaged.yaml
 packaged-provider.yaml
 

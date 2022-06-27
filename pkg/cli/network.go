@@ -1,9 +1,9 @@
 package cli
 
 import (
+	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/olxbr/network-api/pkg/client"
@@ -22,30 +22,11 @@ func newNetworkCommand() *cobra.Command {
 				return err
 			}
 			ctx := cmd.Context()
-			cmd.SetContext(WithConfig(ctx, cfg))
-			path := filepath.Join(os.Getenv("HOME"), configPathDefault)
-			auth, err := client.NewOAuth2Authorizer(&client.OAuth2AuthorizerOptions{
-				ClientID: cfg.ClientID,
-				Issuer:   cfg.IssuerURL,
-				Scopes:   cfg.Scopes,
-				TokenDir: path,
-			})
+			ctx, err = SetupClientContext(WithConfig(ctx, cfg), cfg)
 			if err != nil {
-				log.Printf("error: %+v", err)
 				return err
 			}
-			defer auth.Close()
-			t, err := auth.GetToken(ctx)
-			if err != nil {
-				log.Printf("error: %+v", err)
-				return err
-			}
-			httpClient := auth.NewClient(ctx, t)
-
-			cmd.SetContext(client.WithNewClient(ctx, &client.ClientOptions{
-				Endpoint: cfg.Endpoint,
-				Client:   httpClient,
-			}))
+			cmd.SetContext(ctx)
 			return nil
 		},
 	}
@@ -53,6 +34,7 @@ func newNetworkCommand() *cobra.Command {
 	networkCmd.AddCommand(networkAddCmd())
 	networkCmd.AddCommand(networkRemoveCmd)
 	networkCmd.AddCommand(networkListCmd)
+	networkCmd.AddCommand(networkInfoCmd)
 
 	return networkCmd
 }
@@ -62,15 +44,28 @@ func networkAddCmd() *cobra.Command {
 	var AttachTGW bool
 	var PrivateSubnet bool
 	var PublicSubnet bool
+	var Legacy bool
+	var Reserved bool
+	var CIDR string
+	var SubnetSize int
 	c := &cobra.Command{
 		Use:   "add",
 		Short: "Creates a new network",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 			cli, ok := client.ClientFromContext(ctx)
 			if !ok {
 				log.Printf("error retriving client")
-				return
+				return nil
+			}
+
+			if Reserved || Legacy {
+				if CIDR == "" {
+					return fmt.Errorf("missing CIDR with flags --reserved or --legacy")
+				}
+				req.CIDR = CIDR
+			} else {
+				req.SubnetSize = SubnetSize
 			}
 
 			req.AttachTGW = types.Bool(AttachTGW)
@@ -80,10 +75,11 @@ func networkAddCmd() *cobra.Command {
 			n, err := cli.CreateNetwork(ctx, req)
 			if err != nil {
 				log.Printf("error creating network: %+v", err)
-				return
+				return err
 			}
 
 			log.Printf("Network: %+v", n)
+			return nil
 		},
 	}
 
@@ -92,10 +88,17 @@ func networkAddCmd() *cobra.Command {
 	f.StringVar(&req.Account, "account", "", "Account")
 	f.StringVar(&req.Region, "region", "", "Region")
 	f.StringVarP(&req.Environment, "environment", "e", "", "Environment")
-	f.IntVar(&req.SubnetSize, "subnet", 0, "subnet")
+	f.IntVar(&SubnetSize, "subnet-size", 0, "subnet")
+
+	f.StringVar(&req.Info, "info", "", "Extra information about the VPC")
+
 	f.BoolVar(&AttachTGW, "transit-gateway", true, "Attach transit gateway")
 	f.BoolVar(&PrivateSubnet, "private", true, "Private subnet")
 	f.BoolVar(&PublicSubnet, "public", true, "Public subnet")
+
+	f.BoolVar(&Legacy, "legacy", false, "Legacy network - requires CIDR")
+	f.BoolVar(&Reserved, "reserved", false, "Reserverd network - requires CIDR")
+	f.StringVar(&CIDR, "cidr", "", "CIDR")
 
 	return c
 }
@@ -105,6 +108,30 @@ var networkRemoveCmd = &cobra.Command{
 	Short: "Configure remote endpoint",
 	Run: func(cmd *cobra.Command, args []string) {
 
+	},
+}
+
+var networkInfoCmd = &cobra.Command{
+	Use:   "info",
+	Short: "Configure remote endpoint",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		ctx := cmd.Context()
+		cli, ok := client.ClientFromContext(ctx)
+		if !ok {
+			log.Printf("error retriving client")
+			return
+		}
+
+		id := args[0]
+
+		n, err := cli.DetailNetwork(ctx, id)
+		if err != nil {
+			log.Printf("Error: %s", err)
+			return
+		}
+
+		fmt.Printf("Network: %s", n.ID.String())
 	},
 }
 
