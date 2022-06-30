@@ -6,4 +6,4 @@ deployment/network-api
 deployment/jwt-authorizer
 packaged.yaml
 packaged-provider.yaml
-
+parameters.json

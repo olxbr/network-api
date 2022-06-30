@@ -28,8 +28,8 @@ mocks:
 	cd pkg/db && mockery --all --output fake --outpkg fake --case underscore
 	cd pkg/secret && mockery --all --output fake --outpkg fake --case underscore
 
-run:
-	sam local start-api
+run: build
+	sam local start-api --template-file deployment/sam_network_api.yaml
 
 clean:
 	rm -rf ./bin/*
