@@ -17,7 +17,7 @@ func (a *api) ListPools(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJson(w, types.PoolResponse{
+	writeJson(w, types.PoolListResponse{
 		Items: pools,
 	}, http.StatusOK)
 }

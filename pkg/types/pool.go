@@ -21,7 +21,7 @@ type PoolRequest struct {
 	SubnetMaxIP *string `json:"subnetMaxIP,omitempty" validate:"required_without=SubnetMask,excluded_with=SubnetMask,omitempty,ip"`
 }
 
-type PoolResponse struct {
+type PoolListResponse struct {
 	Items []*Pool `json:"items"`
 }
 

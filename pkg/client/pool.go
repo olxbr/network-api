@@ -10,7 +10,7 @@ import (
 	"github.com/olxbr/network-api/pkg/types"
 )
 
-func (c *Client) ListPools(ctx context.Context) (*types.PoolResponse, error) {
+func (c *Client) ListPools(ctx context.Context) (*types.PoolListResponse, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseUrl("api/v1/pools"), nil)
 	if err != nil {
 		return nil, err
@@ -23,7 +23,7 @@ func (c *Client) ListPools(ctx context.Context) (*types.PoolResponse, error) {
 	defer resp.Body.Close()
 	d := json.NewDecoder(resp.Body)
 
-	p := &types.PoolResponse{}
+	p := &types.PoolListResponse{}
 	if err := d.Decode(p); err != nil {
 		return nil, err
 	}
