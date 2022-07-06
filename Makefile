@@ -13,7 +13,9 @@ VERSION := $(shell echo "${COMMIT_TAG}" | sed 's/^.//')
 GO_LDFLAGS := -ldflags "-X '${REPO}/cmd.Version=${VERSION}' -X '${REPO}/cmd.CommitID=${COMMIT_ID}' -X '${REPO}/cmd.BuildTime=${BUILD_TIME}'"
 
 test:
-	go test ./... -cover
+	@go test ./... -coverprofile cover.out
+	@echo "" && go tool cover -func cover.out | grep -e '^total.*' | tr -s '[:blank:]' ' '
+	@rm cover.out
 
 lint:
 ifneq (${GOLANG_LINT_VERSION}, ${GOLANGLINT_INSTALLED_VERSION})
