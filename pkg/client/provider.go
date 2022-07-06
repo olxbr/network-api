@@ -10,7 +10,7 @@ import (
 	"github.com/olxbr/network-api/pkg/types"
 )
 
-func (c *Client) ListProviders(ctx context.Context) (*types.ProviderResponse, error) {
+func (c *Client) ListProviders(ctx context.Context) (*types.ProviderListResponse, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseUrl("api/v1/providers"), nil)
 	if err != nil {
 		return nil, err
@@ -23,7 +23,7 @@ func (c *Client) ListProviders(ctx context.Context) (*types.ProviderResponse, er
 	defer resp.Body.Close()
 	d := json.NewDecoder(resp.Body)
 
-	p := &types.ProviderResponse{}
+	p := &types.ProviderListResponse{}
 	if err := d.Decode(p); err != nil {
 		return nil, err
 	}

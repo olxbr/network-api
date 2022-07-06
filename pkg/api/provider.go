@@ -17,7 +17,7 @@ func (a *api) ListProviders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJson(w, types.ProviderResponse{
+	writeJson(w, types.ProviderListResponse{
 		Items: providers,
 	}, http.StatusOK)
 }
@@ -62,7 +62,7 @@ func (a *api) CreateProvider(w http.ResponseWriter, r *http.Request) {
 func (a *api) DetailProvider(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	params := mux.Vars(r)
-	p, err := a.DB.GetProvider(ctx, params["region"])
+	p, err := a.DB.GetProvider(ctx, params["name"])
 
 	if err != nil {
 		writeError(w, err, http.StatusInternalServerError)

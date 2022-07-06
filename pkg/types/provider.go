@@ -13,7 +13,7 @@ type ProviderRequest struct {
 	APIToken   string `json:"apiToken" validate:"required"`
 }
 
-type ProviderResponse struct {
+type ProviderListResponse struct {
 	Items []*Provider `json:"items"`
 }
 
