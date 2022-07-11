@@ -1,10 +1,12 @@
 .aws-sam/
+.docker/
 bin/
 cover.out
 deployment/aws-provider
 deployment/azure-provider
 deployment/network-api
 deployment/jwt-authorizer
+docker/
 packaged.yaml
 packaged-provider.yaml
 parameters.json

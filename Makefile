@@ -30,8 +30,11 @@ mocks:
 	cd pkg/db && mockery --all --output fake --outpkg fake --case underscore
 	cd pkg/secret && mockery --all --output fake --outpkg fake --case underscore
 
-run: build
-	sam local start-api --template-file deployment/sam_network_api.yaml
+run:
+	GOARCH=amd64 GOOS=linux go build -o deployment/network-api ${GO_LDFLAGS} ./cmd/network-api
+	sam local start-api \
+	--template-file deployment/sam_network_api.yaml \
+	--docker-network network-api_default
 
 clean:
 	rm -rf ./bin/*
