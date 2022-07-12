@@ -178,18 +178,20 @@ func TestCanCreatePool(t *testing.T) {
 }
 
 func TestCanDetailPool(t *testing.T) {
+	poolId := types.NewUUID()
+
 	tests := []struct {
 		name    string
-		region  string
+		id      string
 		prepare func(t *testing.T, db *fakeDb.Database)
 		assert  func(t *testing.T, db *fakeDb.Database, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:   "valid pool region",
-			region: "us-east-1",
+			name: "valid pool id",
+			id:   poolId.String(),
 			prepare: func(t *testing.T, db *fakeDb.Database) {
-				db.On("GetPool", mock.Anything, "us-east-1").Return(&types.Pool{
-					ID:         types.NewUUID(),
+				db.On("GetPool", mock.Anything, poolId.String()).Return(&types.Pool{
+					ID:         poolId,
 					Name:       "pool-us",
 					Region:     "us-east-1",
 					SubnetIP:   "10.2.0.0",
@@ -216,7 +218,7 @@ func TestCanDetailPool(t *testing.T) {
 			tt.prepare(t, db)
 
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
-			req = mux.SetURLVars(req, map[string]string{"region": tt.region})
+			req = mux.SetURLVars(req, map[string]string{"id": tt.id})
 			w := httptest.NewRecorder()
 			api := New(db, nil)
 
@@ -228,24 +230,26 @@ func TestCanDetailPool(t *testing.T) {
 }
 
 func TestCanDeletePool(t *testing.T) {
+	poolId := types.NewUUID()
+
 	tests := []struct {
 		name    string
-		region  string
+		id      string
 		prepare func(t *testing.T, db *fakeDb.Database)
 		assert  func(t *testing.T, db *fakeDb.Database, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:   "valid delete",
-			region: "us-east-1",
+			name: "valid delete",
+			id:   poolId.String(),
 			prepare: func(t *testing.T, db *fakeDb.Database) {
-				db.On("GetPool", mock.Anything, "us-east-1").Return(&types.Pool{
-					ID:         types.NewUUID(),
+				db.On("GetPool", mock.Anything, poolId.String()).Return(&types.Pool{
+					ID:         poolId,
 					Name:       "pool-us",
 					Region:     "us-east-1",
 					SubnetIP:   "10.2.0.0",
 					SubnetMask: types.Int(16),
 				}, nil)
-				db.On("DeletePool", mock.Anything, "us-east-1").Return(nil)
+				db.On("DeletePool", mock.Anything, poolId.String()).Return(nil)
 			},
 			assert: func(t *testing.T, db *fakeDb.Database, w *httptest.ResponseRecorder) {
 				db.AssertExpectations(t)
@@ -267,7 +271,7 @@ func TestCanDeletePool(t *testing.T) {
 			tt.prepare(t, db)
 
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
-			req = mux.SetURLVars(req, map[string]string{"region": tt.region})
+			req = mux.SetURLVars(req, map[string]string{"id": tt.id})
 			w := httptest.NewRecorder()
 			api := New(db, nil)
 
