@@ -33,11 +33,11 @@ func (d *database) ScanPools(ctx context.Context) ([]*types.Pool, error) {
 	return pools, nil
 }
 
-func (d *database) GetPool(ctx context.Context, region string) (*types.Pool, error) {
+func (d *database) GetPool(ctx context.Context, id string) (*types.Pool, error) {
 	so, err := d.Client.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String("napi_pools"),
 		Key: map[string]dynatypes.AttributeValue{
-			"region": &dynatypes.AttributeValueMemberS{Value: region},
+			"id": &dynatypes.AttributeValueMemberS{Value: id},
 		},
 	})
 	if err != nil {
@@ -66,11 +66,11 @@ func (d *database) PutPool(ctx context.Context, p *types.Pool) error {
 	return err
 }
 
-func (d *database) DeletePool(ctx context.Context, region string) error {
+func (d *database) DeletePool(ctx context.Context, id string) error {
 	_, err := d.Client.DeleteItem(ctx, &dynamodb.DeleteItemInput{
 		TableName: aws.String("napi_pools"),
 		Key: map[string]dynatypes.AttributeValue{
-			"region": &dynatypes.AttributeValueMemberS{Value: region},
+			"id": &dynatypes.AttributeValueMemberS{Value: id},
 		},
 	})
 	return err

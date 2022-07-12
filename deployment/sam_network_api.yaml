@@ -231,12 +231,12 @@ Resources:
     Properties:
       TableName: napi_pools
       AttributeDefinitions:
-        - AttributeName: region
+        - AttributeName: id
           AttributeType: S
         - AttributeName: sk
           AttributeType: S
       KeySchema:
-        - AttributeName: region
+        - AttributeName: id
           KeyType: HASH
         - AttributeName: sk
           KeyType: RANGE

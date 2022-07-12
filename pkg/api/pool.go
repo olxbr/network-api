@@ -63,7 +63,7 @@ func (a *api) CreatePool(w http.ResponseWriter, r *http.Request) {
 func (a *api) DetailPool(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	params := mux.Vars(r)
-	p, err := a.DB.GetPool(ctx, params["region"])
+	p, err := a.DB.GetPool(ctx, params["id"])
 
 	if err != nil {
 		writeError(w, err, http.StatusInternalServerError)
@@ -77,12 +77,12 @@ func (a *api) DeletePool(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	params := mux.Vars(r)
 
-	p, err := a.DB.GetPool(ctx, params["region"])
+	p, err := a.DB.GetPool(ctx, params["id"])
 	if err != nil {
 		writeError(w, err, http.StatusInternalServerError)
 	}
 
-	err = a.DB.DeletePool(ctx, p.Region)
+	err = a.DB.DeletePool(ctx, p.ID.String())
 	if err != nil {
 		writeError(w, err, http.StatusInternalServerError)
 		return

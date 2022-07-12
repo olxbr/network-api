@@ -14,9 +14,9 @@ type Database interface {
 	DeleteNetwork(ctx context.Context, id string) error
 
 	ScanPools(ctx context.Context) ([]*types.Pool, error)
-	GetPool(ctx context.Context, region string) (*types.Pool, error)
+	GetPool(ctx context.Context, id string) (*types.Pool, error)
 	PutPool(ctx context.Context, p *types.Pool) error
-	DeletePool(ctx context.Context, region string) error
+	DeletePool(ctx context.Context, id string) error
 
 	ScanProviders(ctx context.Context) ([]*types.Provider, error)
 	GetProvider(ctx context.Context, name string) (*types.Provider, error)
