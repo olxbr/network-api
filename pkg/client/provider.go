@@ -64,3 +64,28 @@ func (c *Client) CreateProvider(ctx context.Context, r *types.ProviderRequest) (
 
 	return p, nil
 }
+
+func (c *Client) DeleteProvider(ctx context.Context, name string) error {
+	url := c.baseUrl("api/v1/providers/" + name)
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	d := json.NewDecoder(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		e := &types.ErrorResponse{}
+		if err := d.Decode(e); err != nil {
+			return err
+		}
+		return fmt.Errorf("request failed %d: %+v", resp.StatusCode, e)
+	}
+
+	return nil
+}

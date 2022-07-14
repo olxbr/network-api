@@ -73,15 +73,30 @@ func providerAddCmd() *cobra.Command {
 
 var providerRemoveCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "Configure remote endpoint",
+	Short: "Removes a provider",
 	Run: func(cmd *cobra.Command, args []string) {
+		ctx := cmd.Context()
+		cli, ok := client.ClientFromContext(ctx)
+		if !ok {
+			log.Printf("error retriving client")
+			return
+		}
 
+		name := args[0]
+
+		err := cli.DeleteProvider(ctx, name)
+		if err != nil {
+			log.Printf("Error: %s", err)
+			return
+		}
+
+		log.Printf("Provider removed: %s", name)
 	},
 }
 
 var providerListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "Configure remote endpoint",
+	Short: "List available providers",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := cmd.Context()
 		cli, ok := client.ClientFromContext(ctx)
