@@ -26,6 +26,12 @@ endif
 build:
 	go build -o ./bin/network-api ${GO_LDFLAGS} ./cmd/network-api
 
+build_cli:
+	go build -o ./bin/network-cli ${GO_LDFLAGS} ./cmd/network-cli
+
+install_cli:
+	go install ${GO_LDFLAGS} ./cmd/network-cli
+
 mocks:
 	cd pkg/db && mockery --all --output fake --outpkg fake --case underscore
 	cd pkg/secret && mockery --all --output fake --outpkg fake --case underscore
