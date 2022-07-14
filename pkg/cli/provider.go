@@ -31,8 +31,9 @@ func newProviderCommand() *cobra.Command {
 	}
 
 	providerCmd.AddCommand(providerAddCmd())
-	providerCmd.AddCommand(providerRemoveCmd)
 	providerCmd.AddCommand(providerListCmd)
+	providerCmd.AddCommand(providerUpdateCmd())
+	providerCmd.AddCommand(providerRemoveCmd)
 
 	return providerCmd
 }
@@ -71,29 +72,6 @@ func providerAddCmd() *cobra.Command {
 	return c
 }
 
-var providerRemoveCmd = &cobra.Command{
-	Use:   "remove",
-	Short: "Removes a provider",
-	Run: func(cmd *cobra.Command, args []string) {
-		ctx := cmd.Context()
-		cli, ok := client.ClientFromContext(ctx)
-		if !ok {
-			log.Printf("error retriving client")
-			return
-		}
-
-		name := args[0]
-
-		err := cli.DeleteProvider(ctx, name)
-		if err != nil {
-			log.Printf("Error: %s", err)
-			return
-		}
-
-		log.Printf("Provider removed: %s", name)
-	},
-}
-
 var providerListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List available providers",
@@ -121,5 +99,66 @@ var providerListCmd = &cobra.Command{
 		}
 
 		table.Render()
+	},
+}
+
+func providerUpdateCmd() *cobra.Command {
+	req := &types.ProviderUpdateRequest{}
+	var WebhookURL string
+	var APIToken string
+
+	c := &cobra.Command{
+		Use:   "update",
+		Short: "Updates a provider",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
+			cli, ok := client.ClientFromContext(ctx)
+			if !ok {
+				log.Printf("error retriving client")
+				return
+			}
+
+			name := args[0]
+			req.WebhookURL = types.String(WebhookURL)
+			req.APIToken = types.String(APIToken)
+
+			p, err := cli.UpdateProvider(ctx, name, req)
+			if err != nil {
+				log.Printf("Error: %s", err)
+				return
+			}
+
+			log.Printf("Updated provider: %+v", p)
+		},
+	}
+
+	f := c.Flags()
+	f.StringVar(&WebhookURL, "url", "", "Webhook URL")
+	f.StringVar(&APIToken, "token", "", "API Token")
+
+	return c
+}
+
+var providerRemoveCmd = &cobra.Command{
+	Use:   "remove",
+	Short: "Removes a provider",
+	Run: func(cmd *cobra.Command, args []string) {
+		ctx := cmd.Context()
+		cli, ok := client.ClientFromContext(ctx)
+		if !ok {
+			log.Printf("error retriving client")
+			return
+		}
+
+		name := args[0]
+
+		err := cli.DeleteProvider(ctx, name)
+		if err != nil {
+			log.Printf("Error: %s", err)
+			return
+		}
+
+		log.Printf("Provider removed: %s", name)
 	},
 }

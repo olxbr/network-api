@@ -65,6 +65,42 @@ func (c *Client) CreateProvider(ctx context.Context, r *types.ProviderRequest) (
 	return p, nil
 }
 
+func (c *Client) UpdateProvider(ctx context.Context, name string, r *types.ProviderUpdateRequest) (*types.Provider, error) {
+	buf := &bytes.Buffer{}
+	e := json.NewEncoder(buf)
+	if err := e.Encode(r); err != nil {
+		return nil, err
+	}
+
+	url := c.baseUrl("api/v1/providers/" + name)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, buf)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	d := json.NewDecoder(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		e := &types.ErrorResponse{}
+		if err := d.Decode(e); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("request failed %d: %+v", resp.StatusCode, e)
+	}
+
+	p := &types.Provider{}
+	if err := d.Decode(p); err != nil {
+		return nil, err
+	}
+
+	return p, nil
+}
+
 func (c *Client) DeleteProvider(ctx context.Context, name string) error {
 	url := c.baseUrl("api/v1/providers/" + name)
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
