@@ -7,13 +7,13 @@ require (
 	github.com/aws/aws-lambda-go v1.32.1
 	github.com/aws/aws-sdk-go-v2 v1.16.7
 	github.com/aws/aws-sdk-go-v2/config v1.15.3
-	github.com/aws/aws-sdk-go-v2/credentials v1.11.2
+	github.com/aws/aws-sdk-go-v2/credentials v1.12.9
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.8.4
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.3
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.9
 	github.com/aws/aws-sdk-go-v2/service/kms v1.17.2
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.15.4
-	github.com/aws/aws-sdk-go-v2/service/sts v1.16.3
+	github.com/aws/aws-sdk-go-v2/service/sts v1.16.9
 	github.com/aws/smithy-go v1.12.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.13.1
 	github.com/go-playground/validator/v10 v10.10.1
@@ -33,15 +33,15 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.3 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.8 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.14 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.8 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.10 // indirect
 	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.13.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.11.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.8 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.11.12 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
