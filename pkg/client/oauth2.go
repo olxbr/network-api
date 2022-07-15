@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -232,13 +233,14 @@ func (o *OAuth2Authorizer) Authorize(ctx context.Context) (*oauth2.Token, error)
 }
 
 func (o *OAuth2Authorizer) RefreshToken(ctx context.Context, rt string) (*oauth2.Token, error) {
-	ct := &oauth2.Token{
-		Expiry:       time.Now(),
-		RefreshToken: rt,
+	opts := []oauth2.AuthCodeOption{
+		oauth2.SetAuthURLParam("grant_type", "refresh_token"),
+		oauth2.SetAuthURLParam("refresh_token", rt),
+		// AzureAD requires scope to be set
+		oauth2.SetAuthURLParam("scope", strings.Join(o.cfg.OAuth2Config.Scopes, " ")),
 	}
 
-	s := o.cfg.OAuth2Config.TokenSource(ctx, ct)
-	t, err := s.Token()
+	t, err := o.cfg.OAuth2Config.Exchange(ctx, "", opts...)
 	if err != nil {
 		return nil, err
 	}

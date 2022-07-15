@@ -82,8 +82,8 @@ func poolAddCmd() *cobra.Command {
 	f.StringVar(&subnetMaxIP, "subnet-maxip", "", "Subnet Maximum IP Address")
 
 	c.MarkFlagsMutuallyExclusive("subnet-mask", "subnet-maxip")
-	c.MarkFlagRequired("region")
-	c.MarkFlagRequired("subnet-ip")
+	_ = c.MarkFlagRequired("region")
+	_ = c.MarkFlagRequired("subnet-ip")
 
 	return c
 }
