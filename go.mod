@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.15.3
 	github.com/aws/aws-sdk-go-v2/credentials v1.12.9
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.8.4
-	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.3
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.22.0
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.9
 	github.com/aws/aws-sdk-go-v2/service/kms v1.17.2
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.15.4
