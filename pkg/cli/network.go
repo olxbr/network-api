@@ -105,7 +105,7 @@ func networkAddCmd() *cobra.Command {
 
 var networkRemoveCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "Configure remote endpoint",
+	Short: "Removes a network",
 	Run: func(cmd *cobra.Command, args []string) {
 
 	},
@@ -113,7 +113,7 @@ var networkRemoveCmd = &cobra.Command{
 
 var networkInfoCmd = &cobra.Command{
 	Use:   "info",
-	Short: "Configure remote endpoint",
+	Short: "Show network details",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := cmd.Context()
@@ -137,7 +137,7 @@ var networkInfoCmd = &cobra.Command{
 
 var networkListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "Configure remote endpoint",
+	Short: "List networks",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := cmd.Context()
 		cli, ok := client.ClientFromContext(ctx)
