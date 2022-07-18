@@ -67,17 +67,20 @@ The cloudformation template has the following parameters:
 | TGWSubnet1Cidr     |                                                                           |
 | TGWSubnet2Cidr     |                                                                           |
 
-## Local
+## Running local
 
 ```
-GOARCH=amd64 GOOS=linux go build -o api ./cmd/network-api
-sam local start-api
+GOARCH=amd64 GOOS=linux go build -o deployment/network-api ./cmd/network-api
+sam local start-api --template-file deployment/sam_network_api.yaml
+
+# or:
+make run
 ```
 
-## Deploy
+## Deploy API
 
-parameters.json:
-```
+Fill parameters.json:
+```json
 [
     {
         "ParameterKey": "VpcId",
@@ -106,9 +109,21 @@ parameters.json:
 ]
 ```
 
+Then:
+```
+make package
+make deploy
+```
+
+## Deploy AWS Provider
+```
+make package_provider
+make deploy_provider
+```
+
 ## Configuring
 
-```
+```bash
 export ENDPOINT="..."
 
 # Pools
@@ -118,5 +133,22 @@ curl -H "Content-Type: application/json" -d '{"region":"sa-east-1","name":"south
 # Providers
 curl -H "Content-Type: application/json" -d '{"name":"aws","webhookURL":"https://something.localhost","apiToken":"1234token"}' -v $ENDPOINT/api/v1/providers
 
+# Networks
 curl -H "Content-Type: application/json" -d '{"region":"us-east-1","subnetSize":16,"account":"123","provider":"aws","environment":"prod","attachTGW":true,"privateSubnet":true,"publicSubnet":true}' -v $ENDPOINT/api/v1/networks
+```
+
+## Network-CLI
+There's a CLI tool to easily call network-api actions and help you automate some jobs.
+
+Install:
+```
+go install ./cmd/network-cli
+
+# or:
+make install_cli
+```
+
+Show available commands:
+```
+network-cli --help
 ```
