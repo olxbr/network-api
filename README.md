@@ -1,5 +1,7 @@
 # Network API
 
+[![Actions Status](https://github.com/olxbr/network-api/actions/workflows/ci.yaml/badge.svg)](https://github.com/olxbr/network-api/actions)
+
 A multi cloud network API that let you automate the management of multiple VPCs in diferent cloud providers.
 
 It works as a serverless application running primarily on AWS, using AWS SAM for orchestrating the deployment and DynamoDB for storing network metadata. Providers are pluggable by using a webhook, currently only `aws-provider` is available.
