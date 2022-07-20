@@ -149,7 +149,7 @@ go install ./cmd/network-cli
 # or:
 make install_cli
 ```
-If you didn't have Go installed, you can download a binary in [releases](https://github.com/olxbr/network-api/releases)
+If you don't have Go installed, you can download a binary in [releases](https://github.com/olxbr/network-api/releases)
 
 
 ### Some examples:
