@@ -149,6 +149,41 @@ go install ./cmd/network-cli
 # or:
 make install_cli
 ```
+If you didn't have Go installed, you can download a binary in [releases](https://github.com/olxbr/network-api/releases)
+
+
+### Some examples:
+
+Configure CLI
+```
+network-cli config \
+  --endpoint <api-endpoint> \
+  --oidc-client-id <client-id> \
+  --oidc-issuer <issuer-url> \
+  --oidc-scopes "<scope01>,<scope02>"
+```
+
+Network
+```
+# list
+network-cli network list
+
+# add
+network-cli network add --account <account_id> --provider aws --subnet-size 16 \
+    --region us-east-1 --environment prod --private
+
+# info
+network-cli network info <network_id>
+```
+
+Pool
+```
+# list
+network-cli pool list
+
+# add
+network-cli pool add my-pool --region us-east-1 --subnet-ip 10.2.0.0 --subnet-mask 16
+```
 
 Show available commands:
 ```
