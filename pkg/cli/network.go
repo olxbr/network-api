@@ -34,13 +34,14 @@ func newNetworkCommand() *cobra.Command {
 	networkCmd.AddCommand(networkAddCmd())
 	networkCmd.AddCommand(networkRemoveCmd)
 	networkCmd.AddCommand(networkListCmd)
-	networkCmd.AddCommand(networkInfoCmd)
+	networkCmd.AddCommand(networkInfoCmd())
 
 	return networkCmd
 }
 
 func networkAddCmd() *cobra.Command {
 	req := &types.NetworkRequest{}
+
 	var AttachTGW bool
 	var PrivateSubnet bool
 	var PublicSubnet bool
@@ -48,6 +49,7 @@ func networkAddCmd() *cobra.Command {
 	var Reserved bool
 	var CIDR string
 	var SubnetSize int
+
 	c := &cobra.Command{
 		Use:   "add",
 		Short: "Creates a new network",
@@ -111,28 +113,41 @@ var networkRemoveCmd = &cobra.Command{
 	},
 }
 
-var networkInfoCmd = &cobra.Command{
-	Use:   "info",
-	Short: "Show network details",
-	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		ctx := cmd.Context()
-		cli, ok := client.ClientFromContext(ctx)
-		if !ok {
-			log.Printf("error retriving client")
-			return
-		}
+func networkInfoCmd() *cobra.Command {
+	var ID string
+	// var VpcID string
 
-		id := args[0]
+	c := &cobra.Command{
+		Use:   "info",
+		Short: "Show network details",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			cli, ok := client.ClientFromContext(ctx)
+			if !ok {
+				log.Printf("error retriving client")
+				return nil
+			}
 
-		n, err := cli.DetailNetwork(ctx, id)
-		if err != nil {
-			log.Printf("Error: %s", err)
-			return
-		}
+			if ID == "" {
+				return fmt.Errorf("missing Network ID")
+			}
 
-		fmt.Printf("Network: %s", n.ID.String())
-	},
+			n, err := cli.DetailNetwork(ctx, ID)
+			if err != nil {
+				log.Printf("Error: %s", err)
+				return nil
+			}
+
+			fmt.Printf("Network: %s", n.ID.String())
+			return nil
+		},
+	}
+
+	f := c.Flags()
+	f.StringVar(&ID, "network-id", "", "Network ID")
+	// f.StringVar(&VpcID, "--vpc-id", "", "VPC ID")
+
+	return c
 }
 
 var networkListCmd = &cobra.Command{
