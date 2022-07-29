@@ -2,14 +2,34 @@ package cli
 
 import (
 	"fmt"
+	"io"
 	"log"
-	"os"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/olxbr/network-api/pkg/client"
 	"github.com/olxbr/network-api/pkg/types"
 	"github.com/spf13/cobra"
 )
+
+func renderPools(w io.Writer, ps *types.PoolListResponse) {
+	table := tablewriter.NewWriter(w)
+	table.SetHeader([]string{"ID", "Name", "Region", "Range"})
+	for _, p := range ps.Items {
+		var r string
+		if p.SubnetMask != nil {
+			r = fmt.Sprintf("%s/%d", p.SubnetIP, types.ToInt(p.SubnetMask))
+		} else if p.SubnetMaxIP != nil {
+			r = fmt.Sprintf("%s - %s", p.SubnetIP, types.ToString(p.SubnetMaxIP))
+		}
+		table.Append([]string{
+			p.ID.String(),
+			p.Name,
+			p.Region,
+			r,
+		})
+	}
+	table.Render()
+}
 
 func newPoolCommand() *cobra.Command {
 	poolCmd := &cobra.Command{
@@ -71,7 +91,10 @@ func poolAddCmd() *cobra.Command {
 				return
 			}
 
-			log.Printf("Pool: %+v", p)
+			log.Println("Pool:")
+			renderPools(cmd.OutOrStdout(), &types.PoolListResponse{
+				Items: []*types.Pool{p},
+			})
 		},
 	}
 
@@ -91,9 +114,7 @@ func poolAddCmd() *cobra.Command {
 var poolRemoveCmd = &cobra.Command{
 	Use:   "remove",
 	Short: "Remove a pool",
-	Run: func(cmd *cobra.Command, args []string) {
-
-	},
+	Run:   func(cmd *cobra.Command, args []string) {},
 }
 
 var poolListCmd = &cobra.Command{
@@ -111,24 +132,6 @@ var poolListCmd = &cobra.Command{
 			log.Printf("Error: %s", err)
 			return
 		}
-
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"Name", "Region", "Range"})
-
-		for _, p := range ps.Items {
-			var r string
-			if p.SubnetMask != nil {
-				r = fmt.Sprintf("%s/%d", p.SubnetIP, types.ToInt(p.SubnetMask))
-			} else if p.SubnetMaxIP != nil {
-				r = fmt.Sprintf("%s - %s", p.SubnetIP, types.ToString(p.SubnetMaxIP))
-			}
-			table.Append([]string{
-				p.Name,
-				p.Region,
-				r,
-			})
-		}
-
-		table.Render()
+		renderPools(cmd.OutOrStdout(), ps)
 	},
 }

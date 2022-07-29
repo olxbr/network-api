@@ -1,14 +1,26 @@
 package cli
 
 import (
+	"io"
 	"log"
-	"os"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/olxbr/network-api/pkg/client"
 	"github.com/olxbr/network-api/pkg/types"
 	"github.com/spf13/cobra"
 )
+
+func renderProviders(w io.Writer, ps *types.ProviderListResponse) {
+	table := tablewriter.NewWriter(w)
+	table.SetHeader([]string{"Provider", "URL"})
+	for _, p := range ps.Items {
+		table.Append([]string{
+			p.Name,
+			p.WebhookURL,
+		})
+	}
+	table.Render()
+}
 
 func newProviderCommand() *cobra.Command {
 	providerCmd := &cobra.Command{
@@ -55,13 +67,16 @@ func providerAddCmd() *cobra.Command {
 
 			req.Name = args[0]
 
-			n, err := cli.CreateProvider(ctx, req)
+			p, err := cli.CreateProvider(ctx, req)
 			if err != nil {
-				log.Printf("error creating network: %+v", err)
+				log.Printf("error creating provider: %+v", err)
 				return
 			}
 
-			log.Printf("Network: %+v", n)
+			log.Println("Provider:")
+			renderProviders(cmd.OutOrStdout(), &types.ProviderListResponse{
+				Items: []*types.Provider{p},
+			})
 		},
 	}
 
@@ -87,18 +102,7 @@ var providerListCmd = &cobra.Command{
 			log.Printf("Error: %s", err)
 			return
 		}
-
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"Provider", "URL"})
-
-		for _, p := range ps.Items {
-			table.Append([]string{
-				p.Name,
-				p.WebhookURL,
-			})
-		}
-
-		table.Render()
+		renderProviders(cmd.OutOrStdout(), ps)
 	},
 }
 
@@ -129,7 +133,10 @@ func providerUpdateCmd() *cobra.Command {
 				return
 			}
 
-			log.Printf("Updated provider: %+v", p)
+			log.Println("Updated provider:")
+			renderProviders(cmd.OutOrStdout(), &types.ProviderListResponse{
+				Items: []*types.Provider{p},
+			})
 		},
 	}
 

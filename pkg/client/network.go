@@ -10,7 +10,7 @@ import (
 	"github.com/olxbr/network-api/pkg/types"
 )
 
-func (c *Client) ListNetworks(ctx context.Context) ([]*types.Network, error) {
+func (c *Client) ListNetworks(ctx context.Context) (*types.NetworkListResponse, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseUrl("api/v1/networks"), nil)
 	if err != nil {
 		return nil, err
@@ -30,12 +30,12 @@ func (c *Client) ListNetworks(ctx context.Context) ([]*types.Network, error) {
 		return nil, fmt.Errorf("request failed %d: %+v", resp.StatusCode, e)
 	}
 
-	var list types.NetworkListResponse
-	if err := d.Decode(&list); err != nil {
+	ns := &types.NetworkListResponse{}
+	if err := d.Decode(ns); err != nil {
 		return nil, err
 	}
 
-	return list.Items, nil
+	return ns, nil
 }
 
 func (c *Client) DetailNetwork(ctx context.Context, id string) (*types.Network, error) {

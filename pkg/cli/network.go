@@ -1,15 +1,32 @@
 package cli
 
 import (
-	"fmt"
+	"io"
 	"log"
-	"os"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/olxbr/network-api/pkg/client"
 	"github.com/olxbr/network-api/pkg/types"
 	"github.com/spf13/cobra"
 )
+
+func renderNetworks(w io.Writer, ns *types.NetworkListResponse) {
+	table := tablewriter.NewWriter(w)
+	table.SetHeader([]string{"ID", "Provider", "Account", "Region", "Environment", "CIDR", "VpcID", "Info"})
+	for _, n := range ns.Items {
+		table.Append([]string{
+			n.ID.String(),
+			n.Provider,
+			n.Account,
+			n.Region,
+			n.Environment,
+			n.CIDR,
+			n.VpcID,
+			n.Info,
+		})
+	}
+	table.Render()
+}
 
 func newNetworkCommand() *cobra.Command {
 	networkCmd := &cobra.Command{
@@ -53,17 +70,18 @@ func networkAddCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "add",
 		Short: "Creates a new network",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
 			cli, ok := client.ClientFromContext(ctx)
 			if !ok {
 				log.Printf("error retriving client")
-				return nil
+				return
 			}
 
 			if Reserved || Legacy {
 				if CIDR == "" {
-					return fmt.Errorf("missing CIDR with flags --reserved or --legacy")
+					log.Printf("missing CIDR with flags --reserved or --legacy")
+					return
 				}
 				req.CIDR = CIDR
 			} else {
@@ -74,21 +92,23 @@ func networkAddCmd() *cobra.Command {
 			req.PrivateSubnet = types.Bool(PrivateSubnet)
 			req.PublicSubnet = types.Bool(PublicSubnet)
 
-			n, err := cli.CreateNetwork(ctx, req)
+			nr, err := cli.CreateNetwork(ctx, req)
 			if err != nil {
 				log.Printf("error creating network: %+v", err)
-				return err
+				return
 			}
 
-			log.Printf("Network: %+v", n)
-			return nil
+			log.Println("Network:")
+			renderNetworks(cmd.OutOrStdout(), &types.NetworkListResponse{
+				Items: []*types.Network{nr.Network},
+			})
 		},
 	}
 
 	f := c.Flags()
 	f.StringVar(&req.Provider, "provider", "", "Provider")
 	f.StringVar(&req.Account, "account", "", "Account")
-	f.StringVar(&req.Region, "region", "", "Region")
+	f.StringVar(&req.PoolID, "pool-id", "", "Pool ID")
 	f.StringVarP(&req.Environment, "environment", "e", "", "Environment")
 	f.IntVar(&SubnetSize, "subnet-size", 0, "subnet")
 
@@ -108,9 +128,7 @@ func networkAddCmd() *cobra.Command {
 var networkRemoveCmd = &cobra.Command{
 	Use:   "remove",
 	Short: "Removes a network",
-	Run: func(cmd *cobra.Command, args []string) {
-
-	},
+	Run:   func(cmd *cobra.Command, args []string) {},
 }
 
 func networkInfoCmd() *cobra.Command {
@@ -120,26 +138,29 @@ func networkInfoCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "info",
 		Short: "Show network details",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
 			cli, ok := client.ClientFromContext(ctx)
 			if !ok {
 				log.Printf("error retriving client")
-				return nil
+				return
 			}
 
 			if ID == "" {
-				return fmt.Errorf("missing Network ID")
+				log.Printf("missing Network ID")
+				return
 			}
 
 			n, err := cli.DetailNetwork(ctx, ID)
 			if err != nil {
 				log.Printf("Error: %s", err)
-				return nil
+				return
 			}
 
-			fmt.Printf("Network: %s", n.ID.String())
-			return nil
+			log.Println("Network:")
+			renderNetworks(cmd.OutOrStdout(), &types.NetworkListResponse{
+				Items: []*types.Network{n},
+			})
 		},
 	}
 
@@ -165,23 +186,6 @@ var networkListCmd = &cobra.Command{
 			log.Printf("Error: %s", err)
 			return
 		}
-
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Provider", "Account", "Region", "Environment", "CIDR", "VpcID", "Info"})
-
-		for _, n := range ns {
-			table.Append([]string{
-				n.ID.String(),
-				n.Provider,
-				n.Account,
-				n.Region,
-				n.Environment,
-				n.CIDR,
-				n.VpcID,
-				n.Info,
-			})
-		}
-
-		table.Render()
+		renderNetworks(cmd.OutOrStdout(), ns)
 	},
 }
