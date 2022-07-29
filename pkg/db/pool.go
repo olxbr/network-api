@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
@@ -34,18 +36,23 @@ func (d *database) ScanPools(ctx context.Context) ([]*types.Pool, error) {
 }
 
 func (d *database) GetPool(ctx context.Context, id string) (*types.Pool, error) {
-	so, err := d.Client.GetItem(ctx, &dynamodb.GetItemInput{
-		TableName: aws.String("napi_pools"),
-		Key: map[string]dynatypes.AttributeValue{
-			"id": &dynatypes.AttributeValueMemberS{Value: id},
+	qo, err := d.Client.Query(ctx, &dynamodb.QueryInput{
+		TableName:              aws.String("napi_pools"),
+		KeyConditionExpression: aws.String("id = :hashKey"),
+		ExpressionAttributeValues: map[string]dynatypes.AttributeValue{
+			":hashKey": &dynatypes.AttributeValueMemberS{Value: id},
 		},
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	if qo.Count <= 0 {
+		return nil, errors.New("pool not found")
+	}
+
 	pool := &types.Pool{}
-	err = attributevalue.UnmarshalMap(so.Item, pool)
+	err = attributevalue.UnmarshalMap(qo.Items[0], pool)
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +64,10 @@ func (d *database) PutPool(ctx context.Context, p *types.Pool) error {
 	item, err := attributevalue.MarshalMap(p)
 	if err != nil {
 		return err
+	}
+
+	item["sk"] = &dynatypes.AttributeValueMemberS{
+		Value: fmt.Sprintf("%s#%s#%s", p.Region, p.SubnetIP, p.Name),
 	}
 
 	_, err = d.Client.PutItem(ctx, &dynamodb.PutItemInput{

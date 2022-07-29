@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -35,18 +36,24 @@ func (d *database) ScanNetworks(ctx context.Context) ([]*types.Network, error) {
 }
 
 func (d *database) GetNetwork(ctx context.Context, id string) (*types.Network, error) {
-	so, err := d.Client.GetItem(ctx, &dynamodb.GetItemInput{
-		TableName: aws.String("napi_networks"),
-		Key: map[string]dynatypes.AttributeValue{
-			"id": &dynatypes.AttributeValueMemberS{Value: id},
+	qo, err := d.Client.Query(ctx, &dynamodb.QueryInput{
+		TableName:              aws.String("napi_networks"),
+		KeyConditionExpression: aws.String("id = :hashKey"),
+		ExpressionAttributeValues: map[string]dynatypes.AttributeValue{
+			":hashKey": &dynatypes.AttributeValueMemberS{Value: id},
 		},
 	})
+
 	if err != nil {
 		return nil, err
 	}
 
+	if qo.Count <= 0 {
+		return nil, errors.New("network not found")
+	}
+
 	network := &types.Network{}
-	err = attributevalue.UnmarshalMap(so.Item, network)
+	err = attributevalue.UnmarshalMap(qo.Items[0], network)
 	if err != nil {
 		return nil, err
 	}
