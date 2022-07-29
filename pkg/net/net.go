@@ -41,8 +41,8 @@ func (nm *NetworkManager) CheckNetwork(ctx context.Context, network netaddr.IPPr
 	return nil
 }
 
-func (nm *NetworkManager) AllocateNetwork(ctx context.Context, region string, subnetSize uint8) (netaddr.IPPrefix, error) {
-	p, err := nm.DB.GetPool(ctx, region)
+func (nm *NetworkManager) AllocateNetwork(ctx context.Context, poolID string, subnetSize uint8) (netaddr.IPPrefix, error) {
+	p, err := nm.DB.GetPool(ctx, poolID)
 	if err != nil {
 		return netaddr.IPPrefix{}, fmt.Errorf("error getting pool: %+v", err)
 	}

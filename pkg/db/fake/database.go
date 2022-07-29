@@ -29,13 +29,13 @@ func (_m *Database) DeleteNetwork(ctx context.Context, id string) error {
 	return r0
 }
 
-// DeletePool provides a mock function with given fields: ctx, region
-func (_m *Database) DeletePool(ctx context.Context, region string) error {
-	ret := _m.Called(ctx, region)
+// DeletePool provides a mock function with given fields: ctx, id
+func (_m *Database) DeletePool(ctx context.Context, id string) error {
+	ret := _m.Called(ctx, id)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
-		r0 = rf(ctx, region)
+		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -80,13 +80,13 @@ func (_m *Database) GetNetwork(ctx context.Context, id string) (*types.Network, 
 	return r0, r1
 }
 
-// GetPool provides a mock function with given fields: ctx, region
-func (_m *Database) GetPool(ctx context.Context, region string) (*types.Pool, error) {
-	ret := _m.Called(ctx, region)
+// GetPool provides a mock function with given fields: ctx, id
+func (_m *Database) GetPool(ctx context.Context, id string) (*types.Pool, error) {
+	ret := _m.Called(ctx, id)
 
 	var r0 *types.Pool
 	if rf, ok := ret.Get(0).(func(context.Context, string) *types.Pool); ok {
-		r0 = rf(ctx, region)
+		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*types.Pool)
@@ -95,7 +95,7 @@ func (_m *Database) GetPool(ctx context.Context, region string) (*types.Pool, er
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, region)
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}

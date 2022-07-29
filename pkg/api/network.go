@@ -45,7 +45,13 @@ func (a *api) CreateNetwork(w http.ResponseWriter, r *http.Request) {
 
 	pm := provider.New(a.DB, a.Secrets)
 	nm := net.New(a.DB)
-	p, err := pm.GetClient(ctx, nr.Provider)
+	pc, err := pm.GetClient(ctx, nr.Provider)
+	if err != nil {
+		writeError(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	p, err := a.DB.GetPool(ctx, nr.PoolID)
 	if err != nil {
 		writeError(w, err, http.StatusInternalServerError)
 		return
@@ -54,7 +60,7 @@ func (a *api) CreateNetwork(w http.ResponseWriter, r *http.Request) {
 	n := &types.Network{
 		ID:          types.NewUUID(),
 		Account:     nr.Account,
-		Region:      nr.Region,
+		Region:      p.Region,
 		Provider:    nr.Provider,
 		Environment: nr.Environment,
 		Info:        nr.Info,
@@ -91,7 +97,7 @@ func (a *api) CreateNetwork(w http.ResponseWriter, r *http.Request) {
 		}
 		n.CIDR = ipprefix.String()
 	} else {
-		ipprefix, err := nm.AllocateNetwork(ctx, nr.Region, uint8(nr.SubnetSize))
+		ipprefix, err := nm.AllocateNetwork(ctx, nr.PoolID, uint8(nr.SubnetSize))
 		if err != nil {
 			writeError(w, err, http.StatusBadRequest)
 			return
@@ -101,7 +107,7 @@ func (a *api) CreateNetwork(w http.ResponseWriter, r *http.Request) {
 
 	var wh *types.ProviderWebhookResponse
 	if !n.Reserved || !n.Legacy {
-		wh, err = p.CreateNetwork(ctx, n)
+		wh, err = pc.CreateNetwork(ctx, n)
 		if err != nil {
 			writeError(w, err, http.StatusInternalServerError)
 			return

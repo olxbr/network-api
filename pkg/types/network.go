@@ -28,7 +28,7 @@ type Network struct {
 
 type NetworkRequest struct {
 	Account     string `json:"account" validate:"required"`
-	Region      string `json:"region" validate:"required"`
+	PoolID      string `json:"poolID" validate:"required"`
 	Provider    string `json:"provider" validate:"required"`
 	Environment string `json:"environment" validate:"required"`
 

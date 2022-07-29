@@ -26,7 +26,7 @@ func TestAllocateNetwork(t *testing.T) {
 			subnetSize: 24,
 			prepare: func(t *testing.T, db *fake.Database) {
 				db.On("ScanNetworks", mock.Anything).Return([]*types.Network{}, nil)
-				db.On("GetPool", mock.Anything, "us-east-1").Return(&types.Pool{
+				db.On("GetPool", mock.Anything, "poolid").Return(&types.Pool{
 					Region:     "us-east-1",
 					SubnetIP:   "10.0.0.0",
 					SubnetMask: types.Int(8),
@@ -47,7 +47,7 @@ func TestAllocateNetwork(t *testing.T) {
 					{CIDR: "10.0.0.0/24"},
 					{CIDR: "10.0.1.0/24"},
 				}, nil)
-				db.On("GetPool", mock.Anything, "us-east-1").Return(&types.Pool{
+				db.On("GetPool", mock.Anything, "poolid").Return(&types.Pool{
 					Region:     "us-east-1",
 					SubnetIP:   "10.0.0.0",
 					SubnetMask: types.Int(8),
@@ -68,7 +68,7 @@ func TestAllocateNetwork(t *testing.T) {
 					{CIDR: "10.0.0.0/16"},
 					{CIDR: "10.1.0.0/24"},
 				}, nil)
-				db.On("GetPool", mock.Anything, "us-east-1").Return(&types.Pool{
+				db.On("GetPool", mock.Anything, "poolid").Return(&types.Pool{
 					Region:     "us-east-1",
 					SubnetIP:   "10.0.0.0",
 					SubnetMask: types.Int(8),
@@ -89,7 +89,7 @@ func TestAllocateNetwork(t *testing.T) {
 					{CIDR: "10.0.0.0/24"},
 					{CIDR: "10.0.2.0/24"},
 				}, nil)
-				db.On("GetPool", mock.Anything, "us-east-1").Return(&types.Pool{
+				db.On("GetPool", mock.Anything, "poolid").Return(&types.Pool{
 					Region:     "us-east-1",
 					SubnetIP:   "10.0.0.0",
 					SubnetMask: types.Int(8),
@@ -112,7 +112,7 @@ func TestAllocateNetwork(t *testing.T) {
 					{CIDR: "10.128.0.0/24"},
 					{CIDR: "10.192.0.0/23"},
 				}, nil)
-				db.On("GetPool", mock.Anything, "us-east-1").Return(&types.Pool{
+				db.On("GetPool", mock.Anything, "poolid").Return(&types.Pool{
 					Region:     "us-east-1",
 					SubnetIP:   "10.0.0.0",
 					SubnetMask: types.Int(8),

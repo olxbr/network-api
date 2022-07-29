@@ -137,7 +137,7 @@ func TestCanCreateNetwork(t *testing.T) {
 			name: "valid payload data",
 			payload: types.NetworkRequest{
 				Account:       "1234",
-				Region:        "us-east-1",
+				PoolID:        "poolid",
 				Provider:      "aws",
 				Environment:   "prod",
 				Info:          "First VPC",
@@ -151,7 +151,7 @@ func TestCanCreateNetwork(t *testing.T) {
 					WebhookURL: server.URL,
 				}, nil)
 				s.On("GetAPIToken", mock.Anything, "aws").Return("token", nil)
-				db.On("GetPool", mock.Anything, "us-east-1").Return(&types.Pool{
+				db.On("GetPool", mock.Anything, "poolid").Return(&types.Pool{
 					Region:     "us-east-1",
 					SubnetIP:   "10.0.0.0",
 					SubnetMask: types.Int(8),
@@ -188,7 +188,7 @@ func TestCanCreateNetwork(t *testing.T) {
 			name: "valid legacy network data",
 			payload: types.NetworkRequest{
 				Account:       "1234",
-				Region:        "us-east-1",
+				PoolID:        "poolid",
 				Provider:      "aws",
 				Environment:   "prod",
 				Info:          "First VPC",
@@ -201,6 +201,11 @@ func TestCanCreateNetwork(t *testing.T) {
 			prepare: func(t *testing.T, db *fakeDb.Database, s *fakeSecrets.Secrets) {
 				db.On("GetProvider", mock.Anything, "aws").Return(&types.Provider{
 					WebhookURL: server.URL,
+				}, nil)
+				db.On("GetPool", mock.Anything, "poolid").Return(&types.Pool{
+					Region:     "us-east-1",
+					SubnetIP:   "10.0.0.0",
+					SubnetMask: types.Int(8),
 				}, nil)
 				s.On("GetAPIToken", mock.Anything, "aws").Return("token", nil)
 				db.On("ScanNetworks", mock.Anything).Return([]*types.Network{}, nil)
