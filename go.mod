@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/apparentlymart/go-cidr v1.1.0
 	github.com/aws/aws-lambda-go v1.32.1
-	github.com/aws/aws-sdk-go-v2 v1.16.7
+	github.com/aws/aws-sdk-go-v2 v1.16.8
 	github.com/aws/aws-sdk-go-v2/config v1.15.14
 	github.com/aws/aws-sdk-go-v2/credentials v1.12.9
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.9.6
