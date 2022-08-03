@@ -3,12 +3,16 @@ AWSTemplateFormatVersion: "2010-09-09"
 Parameters:
   RoleName:
     Type: String
-    Default: NetworkProvider
+    Default: org-network-provider-api
     Description: Role name for all accounts
   ProviderLambdaRole:
     Type: String
     Default: "arn:aws:iam::123456789012:role/function_lambda_role"
     Description: "Enter Network Provider Lambda Role."
+  TemplatesBucketName:
+    Type: String
+    Default: napi-templates
+    Description: Bucket for Cloudformation templates storage
 
 Resources:
   #####################################################################
@@ -117,6 +121,19 @@ Resources:
                   - cloudformation:ExecuteChangeSet
                 Resource:
                   - !Sub "arn:aws:cloudformation:*:${AWS::AccountId}:stack/network-*/*"
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                  - s3:GetObjectVersion
+                  - s3:GetLifecycleConfiguration
+                Resource: !Join
+                  - - 'arn:aws:s3:::'
+                    - !Ref TemplatesBucketName
+                  - - 'arn:aws:s3:::'
+                    - !Ref TemplatesBucketName
+                    - /*
 
       AssumeRolePolicyDocument:
         Version: "2012-10-17"

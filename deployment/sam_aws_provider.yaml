@@ -10,8 +10,16 @@ Parameters:
     Description: Bucket for Cloudformation templates storage
   TrustRoleName:
     Type: String
-    Default: NetworkProvider
+    Default: org-network-provider-api
     Description: Cross account role name
+  TrustRoleArn:
+    Type: String
+    Default: arn:aws:iam::*:role/org-network-provider-api
+    Description: Cross account role arn
+  ProviderLambdaRoleArn:
+    Type: String
+    Default: arn:aws:iam::123456789012:role/function_lambda_role
+    Description: Provider lambda execution role arn
 
 Resources:
   TemplatesBucket:
@@ -30,6 +38,29 @@ Resources:
               SSEAlgorithm: AES256
       VersioningConfiguration:
         Status: Enabled
+  TemplatesBucketPolicy:
+    Properties:
+      Type: 'AWS::S3::BucketPolicy'
+      Bucket: !Ref TemplatesBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:GetBucketLocation
+              - s3:GetObjectVersion
+              - s3:GetLifecycleConfiguration
+            Effect: Allow
+            Resource: !Join
+              - - 'arn:aws:s3:::'
+                - !Ref TemplatesBucket
+              - - 'arn:aws:s3:::'
+                - !Ref TemplatesBucket
+                - /*
+            Principal:
+              - !Ref TrustRoleArn
+              - !Ref ProviderLambdaRoleArn
 
   WebhookSignKey:
     Type: AWS::KMS::Key
@@ -83,6 +114,11 @@ Resources:
                 Resource:
                   - !Sub "${TemplatesBucket.Arn}"
                   - !Sub "${TemplatesBucket.Arn}/*"
+              - Effect: Allow
+                Action: 
+                  - "sts:AssumeRole"
+                Resource:
+                  - !Ref TrustRoleArn
 
   NetworkWebhook:
     Type: AWS::Serverless::Function
