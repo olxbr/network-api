@@ -51,7 +51,7 @@ func newNetworkCommand() *cobra.Command {
 	networkCmd.AddCommand(networkAddCmd())
 	networkCmd.AddCommand(networkRemoveCmd)
 	networkCmd.AddCommand(networkListCmd)
-	networkCmd.AddCommand(networkInfoCmd())
+	networkCmd.AddCommand(networkInfoCmd)
 
 	return networkCmd
 }
@@ -122,6 +122,11 @@ func networkAddCmd() *cobra.Command {
 	f.BoolVar(&Reserved, "reserved", false, "Reserverd network - requires CIDR")
 	f.StringVar(&CIDR, "cidr", "", "CIDR")
 
+	c.MarkFlagRequired("provider")
+	c.MarkFlagRequired("account")
+	c.MarkFlagRequired("pool-id")
+	c.MarkFlagRequired("environment")
+
 	return c
 }
 
@@ -131,44 +136,30 @@ var networkRemoveCmd = &cobra.Command{
 	Run:   func(cmd *cobra.Command, args []string) {},
 }
 
-func networkInfoCmd() *cobra.Command {
-	var ID string
-	// var VpcID string
+var networkInfoCmd = &cobra.Command{
+	Use:   "info",
+	Short: "Show network details",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		ctx := cmd.Context()
+		cli, ok := client.ClientFromContext(ctx)
+		if !ok {
+			log.Printf("error retriving client")
+			return
+		}
 
-	c := &cobra.Command{
-		Use:   "info",
-		Short: "Show network details",
-		Run: func(cmd *cobra.Command, args []string) {
-			ctx := cmd.Context()
-			cli, ok := client.ClientFromContext(ctx)
-			if !ok {
-				log.Printf("error retriving client")
-				return
-			}
+		networkID := args[0]
+		n, err := cli.DetailNetwork(ctx, networkID)
+		if err != nil {
+			log.Printf("Error: %s", err)
+			return
+		}
 
-			if ID == "" {
-				log.Printf("missing Network ID")
-				return
-			}
-
-			n, err := cli.DetailNetwork(ctx, ID)
-			if err != nil {
-				log.Printf("Error: %s", err)
-				return
-			}
-
-			log.Println("Network:")
-			renderNetworks(cmd.OutOrStdout(), &types.NetworkListResponse{
-				Items: []*types.Network{n},
-			})
-		},
-	}
-
-	f := c.Flags()
-	f.StringVar(&ID, "network-id", "", "Network ID")
-	// f.StringVar(&VpcID, "--vpc-id", "", "VPC ID")
-
-	return c
+		log.Println("Network:")
+		renderNetworks(cmd.OutOrStdout(), &types.NetworkListResponse{
+			Items: []*types.Network{n},
+		})
+	},
 }
 
 var networkListCmd = &cobra.Command{
