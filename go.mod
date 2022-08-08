@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.9.6
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.22.1
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.10
-	github.com/aws/aws-sdk-go-v2/service/kms v1.17.5
+	github.com/aws/aws-sdk-go-v2/service/kms v1.18.1
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.15.13
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.9
 	github.com/aws/smithy-go v1.12.0
