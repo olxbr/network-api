@@ -20,7 +20,10 @@ func TestNewNetworkCommand(t *testing.T) {
 	cmd := newNetworkCommand()
 	var b bytes.Buffer
 	cmd.SetOut(&b)
-	cmd.Execute()
+	err := cmd.Execute()
+	if err != nil {
+		t.Fatal(err)
+	}
 	out, err := ioutil.ReadAll(&b)
 	if err != nil {
 		t.Fatal(err)
@@ -74,7 +77,7 @@ func TestNetworkAddCommand(t *testing.T) {
 			prepare: func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(201)
-				json.NewEncoder(w).Encode(&types.NetworkResponse{
+				_ = json.NewEncoder(w).Encode(&types.NetworkResponse{
 					Network: &types.Network{
 						ID:          uuid,
 						Provider:    "TestProvider",
@@ -141,7 +144,7 @@ func TestNetworkInfoCommand(t *testing.T) {
 			prepare: func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(200)
-				json.NewEncoder(w).Encode(&types.Network{
+				_ = json.NewEncoder(w).Encode(&types.Network{
 					ID:          uuid,
 					Provider:    "TestProvider",
 					Region:      "us-east-1",
@@ -208,7 +211,7 @@ func TestNetworkListCommand(t *testing.T) {
 				},
 			},
 		}
-		json.NewEncoder(w).Encode(nr)
+		_ = json.NewEncoder(w).Encode(nr)
 	}))
 	defer s.Close()
 	ctx := context.TODO()
@@ -220,7 +223,10 @@ func TestNetworkListCommand(t *testing.T) {
 	var b bytes.Buffer
 	cmd.SetOut(&b)
 	log.SetOutput(&b)
-	cmd.ExecuteContext(ctx)
+	err := cmd.ExecuteContext(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
 	out, err := ioutil.ReadAll(&b)
 	if err != nil {
 		t.Fatal(err)

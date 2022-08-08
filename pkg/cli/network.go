@@ -122,10 +122,29 @@ func networkAddCmd() *cobra.Command {
 	f.BoolVar(&Reserved, "reserved", false, "Reserverd network - requires CIDR")
 	f.StringVar(&CIDR, "cidr", "", "CIDR")
 
-	c.MarkFlagRequired("provider")
-	c.MarkFlagRequired("account")
-	c.MarkFlagRequired("pool-id")
-	c.MarkFlagRequired("environment")
+	err := c.MarkFlagRequired("provider")
+	if err != nil {
+		log.Printf("error marking provider flag required: %+v", err)
+		return nil
+	}
+
+	err = c.MarkFlagRequired("account")
+	if err != nil {
+		log.Printf("error marking account flag required: %+v", err)
+		return nil
+	}
+
+	err = c.MarkFlagRequired("pool-id")
+	if err != nil {
+		log.Printf("error marking pool-id flag required: %+v", err)
+		return nil
+	}
+
+	err = c.MarkFlagRequired("environment")
+	if err != nil {
+		log.Printf("error marking environment flag required: %+v", err)
+		return nil
+	}
 
 	return c
 }
