@@ -15,14 +15,14 @@ import (
 func TestAllocateNetwork(t *testing.T) {
 	tests := []struct {
 		name       string
-		region     string
+		poolID     string
 		subnetSize uint8
 		prepare    func(t *testing.T, db *fake.Database)
 		assert     func(t *testing.T, db *fake.Database, n netaddr.IPPrefix, err error)
 	}{
 		{
 			name:       "empty database",
-			region:     "us-east-1",
+			poolID:     "poolid",
 			subnetSize: 24,
 			prepare: func(t *testing.T, db *fake.Database) {
 				db.On("ScanNetworks", mock.Anything).Return([]*types.Network{}, nil)
@@ -40,7 +40,7 @@ func TestAllocateNetwork(t *testing.T) {
 		},
 		{
 			name:       "with existing networks",
-			region:     "us-east-1",
+			poolID:     "poolid",
 			subnetSize: 24,
 			prepare: func(t *testing.T, db *fake.Database) {
 				db.On("ScanNetworks", mock.Anything).Return([]*types.Network{
@@ -61,7 +61,7 @@ func TestAllocateNetwork(t *testing.T) {
 		},
 		{
 			name:       "with existing networks 2",
-			region:     "us-east-1",
+			poolID:     "poolid",
 			subnetSize: 24,
 			prepare: func(t *testing.T, db *fake.Database) {
 				db.On("ScanNetworks", mock.Anything).Return([]*types.Network{
@@ -82,7 +82,7 @@ func TestAllocateNetwork(t *testing.T) {
 		},
 		{
 			name:       "with existing different sizes networks",
-			region:     "us-east-1",
+			poolID:     "poolid",
 			subnetSize: 23,
 			prepare: func(t *testing.T, db *fake.Database) {
 				db.On("ScanNetworks", mock.Anything).Return([]*types.Network{
@@ -103,7 +103,7 @@ func TestAllocateNetwork(t *testing.T) {
 		},
 		{
 			name:       "result network is not in pool",
-			region:     "us-east-1",
+			poolID:     "poolid",
 			subnetSize: 10,
 			prepare: func(t *testing.T, db *fake.Database) {
 				db.On("ScanNetworks", mock.Anything).Return([]*types.Network{
@@ -133,7 +133,7 @@ func TestAllocateNetwork(t *testing.T) {
 			ctx := context.Background()
 
 			tt.prepare(t, db)
-			net, err := nm.AllocateNetwork(ctx, tt.region, tt.subnetSize)
+			net, err := nm.AllocateNetwork(ctx, tt.poolID, tt.subnetSize)
 			tt.assert(t, db, net, err)
 		})
 	}

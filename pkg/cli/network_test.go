@@ -16,21 +16,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewNetworkCommand(t *testing.T) {
-	cmd := newNetworkCommand()
-	var b bytes.Buffer
-	cmd.SetOut(&b)
-	err := cmd.Execute()
-	if err != nil {
-		t.Fatal(err)
-	}
-	out, err := ioutil.ReadAll(&b)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Contains(t, string(out), "Network operations")
-}
-
 func TestNetworkAddCommand(t *testing.T) {
 	uuid := types.NewUUID()
 	params := []string{
