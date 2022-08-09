@@ -5,16 +5,16 @@ go 1.18
 require (
 	github.com/apparentlymart/go-cidr v1.1.0
 	github.com/aws/aws-lambda-go v1.34.1
-	github.com/aws/aws-sdk-go-v2 v1.16.8
+	github.com/aws/aws-sdk-go-v2 v1.16.10
 	github.com/aws/aws-sdk-go-v2/config v1.15.15
 	github.com/aws/aws-sdk-go-v2/credentials v1.12.10
-	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.9.8
+	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.9.10
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.22.1
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.10
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.12
 	github.com/aws/aws-sdk-go-v2/service/kms v1.18.1
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.15.14
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.10
-	github.com/aws/smithy-go v1.12.0
+	github.com/aws/smithy-go v1.12.1
 	github.com/awslabs/aws-lambda-go-api-proxy v0.13.3
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -34,12 +34,12 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.9 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.15 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.9 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.17 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.11 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.16 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.13.11 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.9 // indirect
+	github.com/aws/aws-sdk-go-v2/service/dynamodbstreams v1.13.13 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.11 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.9 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.11.13 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
