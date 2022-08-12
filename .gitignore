@@ -11,3 +11,5 @@ packaged.yaml
 packaged-provider.yaml
 parameters.json
 TODO
+vendor/
+dist/
