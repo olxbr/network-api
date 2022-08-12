@@ -1,6 +1,7 @@
 before:
   hooks:
     - go mod tidy
+
 builds:
   - env:
       - CGO_ENABLED=0
@@ -8,8 +9,10 @@ builds:
       - linux
       - windows
       - darwin
-    id: "network-cli"
     main: ./cmd/network-cli
+    id: network-cli
+    binary: network-cli
+
 archives:
   - replacements:
       darwin: Darwin
@@ -17,13 +20,19 @@ archives:
       windows: Windows
       386: i386
       amd64: x86_64
+
 checksum:
   name_template: 'checksums.txt'
+
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
+
 changelog:
   sort: asc
   filters:
     exclude:
       - '^docs:'
       - '^test:'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
