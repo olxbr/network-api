@@ -33,6 +33,8 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+      - '^chore:'
+      - '^build(deps):'
       - Merge pull request
       - Merge remote-tracking branch
       - Merge branch
