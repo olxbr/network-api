@@ -84,6 +84,9 @@ func providerAddCmd() *cobra.Command {
 	f.StringVar(&req.WebhookURL, "url", "", "Webhook URL")
 	f.StringVar(&req.APIToken, "token", "", "API Token")
 
+	_ = c.MarkFlagRequired("url")
+	_ = c.MarkFlagRequired("token")
+
 	return c
 }
 
