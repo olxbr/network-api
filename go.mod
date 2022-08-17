@@ -6,8 +6,8 @@ require (
 	github.com/apparentlymart/go-cidr v1.1.0
 	github.com/aws/aws-lambda-go v1.34.1
 	github.com/aws/aws-sdk-go-v2 v1.16.11
-	github.com/aws/aws-sdk-go-v2/config v1.16.1
-	github.com/aws/aws-sdk-go-v2/credentials v1.12.13
+	github.com/aws/aws-sdk-go-v2/config v1.17.1
+	github.com/aws/aws-sdk-go-v2/credentials v1.12.14
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.9.11
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.22.4
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.13
@@ -41,7 +41,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.12 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.12 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.11.16 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.11.17 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
