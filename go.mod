@@ -14,7 +14,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/kms v1.18.4
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.15.18
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.13
-	github.com/aws/smithy-go v1.12.1
+	github.com/aws/smithy-go v1.13.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.13.3
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
