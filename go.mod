@@ -16,7 +16,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.13
 	github.com/aws/smithy-go v1.13.4
 	github.com/awslabs/aws-lambda-go-api-proxy v0.13.3
-	github.com/go-playground/validator/v10 v10.11.0
+	github.com/go-playground/validator/v10 v10.11.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
@@ -44,8 +44,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.11.17 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d // indirect
-	github.com/go-playground/locales v0.14.0 // indirect
-	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
@@ -64,10 +64,10 @@ require (
 	github.com/stretchr/objx v0.4.0 // indirect
 	go4.org/intern v0.0.0-20211027215823-ae77deb06f29 // indirect
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 // indirect
-	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
-	golang.org/x/net v0.0.0-20220617184016-355a448f1bc9 // indirect
-	golang.org/x/sys v0.0.0-20220615213510-4f61da869c0c // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/crypto v0.5.0 // indirect
+	golang.org/x/net v0.5.0 // indirect
+	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 )
