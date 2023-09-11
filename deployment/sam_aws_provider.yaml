@@ -16,10 +16,6 @@ Parameters:
     Type: String
     Default: arn:aws:iam::*:role/org-network-provider-api
     Description: Cross account role arn
-  ProviderLambdaRoleArn:
-    Type: String
-    Default: arn:aws:iam::123456789012:role/function_lambda_role
-    Description: Provider lambda execution role arn
 
 Resources:
   TemplatesBucket:
@@ -38,29 +34,6 @@ Resources:
               SSEAlgorithm: AES256
       VersioningConfiguration:
         Status: Enabled
-  TemplatesBucketPolicy:
-    Properties:
-      Type: 'AWS::S3::BucketPolicy'
-      Bucket: !Ref TemplatesBucket
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - s3:GetObject
-              - s3:ListBucket
-              - s3:GetBucketLocation
-              - s3:GetObjectVersion
-              - s3:GetLifecycleConfiguration
-            Effect: Allow
-            Resource: !Join
-              - - 'arn:aws:s3:::'
-                - !Ref TemplatesBucket
-              - - 'arn:aws:s3:::'
-                - !Ref TemplatesBucket
-                - /*
-            Principal:
-              - !Ref TrustRoleArn
-              - !Ref ProviderLambdaRoleArn
 
   WebhookSignKey:
     Type: AWS::KMS::Key
@@ -115,7 +88,7 @@ Resources:
                   - !Sub "${TemplatesBucket.Arn}"
                   - !Sub "${TemplatesBucket.Arn}/*"
               - Effect: Allow
-                Action: 
+                Action:
                   - "sts:AssumeRole"
                 Resource:
                   - !Ref TrustRoleArn
@@ -123,8 +96,11 @@ Resources:
   NetworkWebhook:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: go1.x
-      Handler: aws-provider
+      CodeUri: aws-provider/
+      Runtime: provided.al2
+      Handler: bootstrap
+      Architectures:
+        - arm64
       Timeout: 300
       Environment:
         Variables:

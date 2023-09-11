@@ -79,8 +79,11 @@ Resources:
   NetworkAPIAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: go1.x
-      Handler: jwt-authorizer
+      CodeUri: jwt-authorizer/
+      Runtime: provided.al2
+      Handler: bootstrap
+      Architectures:
+        - arm64
       Environment:
         Variables:
           OIDC_ISSUER: !Ref OIDCIssuer
@@ -91,8 +94,11 @@ Resources:
   NetworkFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: go1.x
-      Handler: network-api
+      CodeUri: network-api/
+      Runtime: provided.al2
+      Handler: bootstrap
+      Architectures:
+        - arm64
       Timeout: 120
       Environment:
         Variables:

@@ -44,13 +44,16 @@ run:
 
 clean:
 	rm -rf ./bin/*
-	rm -f deployment/aws-provider
-	rm -f deployment/network-api
-	rm -f deployment/jwt-authorizer
+	rm -rf deployment/aws-provider
+	rm -rf deployment/network-api
+	rm -rf deployment/jwt-authorizer
+	mkdir -p deployment/network-api
+	mkdir -p deployment/jwt-authorizer
+	mkdir -p deployment/aws-provider
 
 package: clean
-	GOARCH=amd64 GOOS=linux go build -o deployment/network-api ${GO_LDFLAGS} ./cmd/network-api
-	GOARCH=amd64 GOOS=linux go build -o deployment/jwt-authorizer ${GO_LDFLAGS} ./cmd/jwt-authorizer
+	GOARCH=arm64 GOOS=linux go build -tags lambda.norpc -o deployment/network-api/bootstrap ${GO_LDFLAGS} ./cmd/network-api
+	GOARCH=arm64 GOOS=linux go build -tags lambda.norpc -o deployment/jwt-authorizer/bootstrap ${GO_LDFLAGS} ./cmd/jwt-authorizer
 	sam package --template-file deployment/sam_network_api.yaml --s3-bucket network-api-sam --output-template-file packaged.yaml
 
 deploy:
@@ -61,9 +64,12 @@ deploy:
 	--capabilities CAPABILITY_IAM
 
 package_provider: clean
-	GOARCH=amd64 GOOS=linux go build -o deployment/aws-provider ${GO_LDFLAGS} ./cmd/aws-provider
+	GOARCH=arm64 GOOS=linux go build -tags lambda.norpc -o deployment/aws-provider/bootstrap ${GO_LDFLAGS} ./cmd/aws-provider
 	sam package --template-file deployment/sam_aws_provider.yaml --s3-bucket network-api-sam --output-template-file packaged-provider.yaml
 
 deploy_provider:
+	set -e ; \
+	SAM_PARAMETERS=$$(cat parameters_provider.json | jq -r '[ .[] | "\(.ParameterKey)=\(.ParameterValue)" ] | join(" ")' ) ; \
 	sam deploy --template-file packaged-provider.yaml --stack-name network-provider-sam \
+	--parameter-overrides $$SAM_PARAMETERS \
 	--capabilities CAPABILITY_IAM
