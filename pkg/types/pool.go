@@ -1,7 +1,9 @@
 package types
 
 import (
-	"inet.af/netaddr"
+	"net/netip"
+
+	"go4.org/netipx"
 )
 
 type Pool struct {
@@ -25,16 +27,16 @@ type PoolListResponse struct {
 	Items []*Pool `json:"items"`
 }
 
-func (p Pool) Network() netaddr.IP {
-	return netaddr.MustParseIP(p.SubnetIP)
+func (p Pool) Network() netip.Addr {
+	return netip.MustParseAddr(p.SubnetIP)
 }
 
-func (p Pool) Range() netaddr.IPRange {
-	ip := netaddr.MustParseIP(p.SubnetIP)
+func (p Pool) Range() netipx.IPRange {
+	ip := netip.MustParseAddr(p.SubnetIP)
 	if p.SubnetMask != nil {
-		ipnet := netaddr.IPPrefixFrom(ip, uint8(*p.SubnetMask))
-		return ipnet.Range()
+		prefix := netip.PrefixFrom(ip, int(*p.SubnetMask))
+		return netipx.RangeOfPrefix(prefix)
 	}
-	maxIP := netaddr.MustParseIP(*p.SubnetMaxIP)
-	return netaddr.IPRangeFrom(ip, maxIP)
+	maxIP := netip.MustParseAddr(*p.SubnetMaxIP)
+	return netipx.IPRangeFrom(ip, maxIP)
 }

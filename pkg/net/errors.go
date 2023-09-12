@@ -2,13 +2,13 @@ package net
 
 import (
 	"fmt"
+	"net/netip"
 
 	"github.com/olxbr/network-api/pkg/types"
-	"inet.af/netaddr"
 )
 
 type NetworkNotInPoolError struct {
-	Network *netaddr.IPPrefix
+	Network *netip.Prefix
 	Pool    *types.Pool
 }
 

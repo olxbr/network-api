@@ -3,22 +3,22 @@ package net
 import (
 	"context"
 	"log"
+	"net/netip"
 	"testing"
 
 	"github.com/olxbr/network-api/pkg/db/fake"
 	"github.com/olxbr/network-api/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"inet.af/netaddr"
 )
 
 func TestAllocateNetwork(t *testing.T) {
 	tests := []struct {
 		name       string
 		poolID     string
-		subnetSize uint8
+		subnetSize int
 		prepare    func(t *testing.T, db *fake.Database)
-		assert     func(t *testing.T, db *fake.Database, n netaddr.IPPrefix, err error)
+		assert     func(t *testing.T, db *fake.Database, n netip.Prefix, err error)
 	}{
 		{
 			name:       "empty database",
@@ -32,7 +32,7 @@ func TestAllocateNetwork(t *testing.T) {
 					SubnetMask: types.Int(8),
 				}, nil)
 			},
-			assert: func(t *testing.T, db *fake.Database, n netaddr.IPPrefix, err error) {
+			assert: func(t *testing.T, db *fake.Database, n netip.Prefix, err error) {
 				db.AssertExpectations(t)
 				assert.NoError(t, err)
 				assert.Equal(t, "10.0.0.0/24", n.String())
@@ -53,7 +53,7 @@ func TestAllocateNetwork(t *testing.T) {
 					SubnetMask: types.Int(8),
 				}, nil)
 			},
-			assert: func(t *testing.T, db *fake.Database, n netaddr.IPPrefix, err error) {
+			assert: func(t *testing.T, db *fake.Database, n netip.Prefix, err error) {
 				db.AssertExpectations(t)
 				assert.NoError(t, err)
 				assert.Equal(t, "10.0.2.0/24", n.String())
@@ -74,7 +74,7 @@ func TestAllocateNetwork(t *testing.T) {
 					SubnetMask: types.Int(8),
 				}, nil)
 			},
-			assert: func(t *testing.T, db *fake.Database, n netaddr.IPPrefix, err error) {
+			assert: func(t *testing.T, db *fake.Database, n netip.Prefix, err error) {
 				db.AssertExpectations(t)
 				assert.NoError(t, err)
 				assert.Equal(t, "10.1.1.0/24", n.String())
@@ -95,7 +95,7 @@ func TestAllocateNetwork(t *testing.T) {
 					SubnetMask: types.Int(8),
 				}, nil)
 			},
-			assert: func(t *testing.T, db *fake.Database, n netaddr.IPPrefix, err error) {
+			assert: func(t *testing.T, db *fake.Database, n netip.Prefix, err error) {
 				db.AssertExpectations(t)
 				assert.NoError(t, err)
 				assert.Equal(t, "10.0.4.0/23", n.String())
@@ -118,7 +118,7 @@ func TestAllocateNetwork(t *testing.T) {
 					SubnetMask: types.Int(8),
 				}, nil)
 			},
-			assert: func(t *testing.T, db *fake.Database, n netaddr.IPPrefix, err error) {
+			assert: func(t *testing.T, db *fake.Database, n netip.Prefix, err error) {
 				db.AssertExpectations(t)
 				assert.ErrorContains(t, err, "network 11.0.0.0/10 not in pool range 10.0.0.0-10.255.255.255")
 			},
@@ -143,38 +143,38 @@ func TestAllocateNetwork(t *testing.T) {
 func TestNextSubnet(t *testing.T) {
 	tests := []struct {
 		name     string
-		previous netaddr.IPPrefix
-		next     netaddr.IPPrefix
+		previous netip.Prefix
+		next     netip.Prefix
 		valid    bool
 	}{
 		{
 			name:     "9.255.255.0/24",
-			previous: netaddr.MustParseIPPrefix("9.255.255.0/24"),
-			next:     netaddr.MustParseIPPrefix("10.0.0.0/24"),
+			previous: netip.MustParsePrefix("9.255.255.0/24"),
+			next:     netip.MustParsePrefix("10.0.0.0/24"),
 			valid:    true,
 		},
 		{
 			name:     "99.255.255.192/26",
-			previous: netaddr.MustParseIPPrefix("99.255.255.192/26"),
-			next:     netaddr.MustParseIPPrefix("100.0.0.0/26"),
+			previous: netip.MustParsePrefix("99.255.255.192/26"),
+			next:     netip.MustParsePrefix("100.0.0.0/26"),
 			valid:    true,
 		},
 		{
 			name:     "255.255.255.192/26",
-			previous: netaddr.MustParseIPPrefix("255.255.255.192/26"),
-			next:     netaddr.MustParseIPPrefix("0.0.0.0/26"),
+			previous: netip.MustParsePrefix("255.255.255.192/26"),
+			next:     netip.MustParsePrefix("0.0.0.0/26"),
 			valid:    false,
 		},
 		{
 			name:     "2001:db8:d000::/36",
-			previous: netaddr.MustParseIPPrefix("2001:db8:d000::/36"),
-			next:     netaddr.MustParseIPPrefix("2001:db8:e000::/36"),
+			previous: netip.MustParsePrefix("2001:db8:d000::/36"),
+			next:     netip.MustParsePrefix("2001:db8:e000::/36"),
 			valid:    true,
 		},
 		{
 			name:     "ffff:ffff:ffff:ffff::/64",
-			previous: netaddr.MustParseIPPrefix("ffff:ffff:ffff:ffff::/64"),
-			next:     netaddr.MustParseIPPrefix("::/64"),
+			previous: netip.MustParsePrefix("ffff:ffff:ffff:ffff::/64"),
+			next:     netip.MustParsePrefix("::/64"),
 			valid:    false,
 		},
 	}

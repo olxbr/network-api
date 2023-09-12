@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/netip"
 
 	"github.com/gorilla/mux"
-	"inet.af/netaddr"
 
 	"github.com/olxbr/network-api/pkg/net"
 	"github.com/olxbr/network-api/pkg/provider"
@@ -84,7 +84,7 @@ func (a *api) CreateNetwork(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if n.Reserved || n.Legacy {
-		ipprefix, err := netaddr.ParseIPPrefix(nr.CIDR)
+		ipprefix, err := netip.ParsePrefix(nr.CIDR)
 		if err != nil {
 			writeError(w, err, http.StatusBadRequest)
 			return
@@ -97,7 +97,7 @@ func (a *api) CreateNetwork(w http.ResponseWriter, r *http.Request) {
 		}
 		n.CIDR = ipprefix.String()
 	} else {
-		ipprefix, err := nm.AllocateNetwork(ctx, nr.PoolID, uint8(nr.SubnetSize))
+		ipprefix, err := nm.AllocateNetwork(ctx, nr.PoolID, int(nr.SubnetSize))
 		if err != nil {
 			writeError(w, err, http.StatusBadRequest)
 			return

@@ -3,8 +3,7 @@ package types
 import (
 	"fmt"
 	"net"
-
-	"inet.af/netaddr"
+	"net/netip"
 )
 
 // SortKey: [Provider]#[Region]#[Account]#[Environment]#[CIDR]
@@ -81,8 +80,8 @@ func (n Network) Network() net.IPNet {
 	return *cidr
 }
 
-func (n Network) IPPrefix() netaddr.IPPrefix {
-	return netaddr.MustParseIPPrefix(n.CIDR)
+func (n Network) IPPrefix() netip.Prefix {
+	return netip.MustParsePrefix(n.CIDR)
 }
 
 func (n Network) String() string {

@@ -26,10 +26,10 @@ require (
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/spf13/cobra v1.4.1-0.20220620041121-7c9831d376a6
 	github.com/stretchr/testify v1.8.4
+	go4.org/netipx v0.0.0-20230824141953-6213f710f925
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 	golang.org/x/sync v0.1.0
 	gopkg.in/yaml.v3 v3.0.1
-	inet.af/netaddr v0.0.0-20211027220019-c74959edd3b6
 )
 
 require (
@@ -64,8 +64,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	go4.org/intern v0.0.0-20211027215823-ae77deb06f29 // indirect
-	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
