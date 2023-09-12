@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -75,7 +75,7 @@ func TestProviderAddCommand(t *testing.T) {
 			log.SetOutput(&b)
 			cmd.SetArgs(tt.flags)
 			e := cmd.ExecuteContext(ctx)
-			out, err := ioutil.ReadAll(&b)
+			out, err := io.ReadAll(&b)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -122,7 +122,7 @@ func TestProviderListCommand(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	out, err := ioutil.ReadAll(&b)
+	out, err := io.ReadAll(&b)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,7 +178,7 @@ func TestProviderUpdateCommand(t *testing.T) {
 			log.SetOutput(&b)
 			cmd.SetArgs(tt.flags)
 			e := cmd.ExecuteContext(ctx)
-			out, err := ioutil.ReadAll(&b)
+			out, err := io.ReadAll(&b)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -223,7 +223,7 @@ func TestProviderRemoveCommand(t *testing.T) {
 			log.SetOutput(&b)
 			cmd.SetArgs(tt.flags)
 			e := cmd.ExecuteContext(ctx)
-			out, err := ioutil.ReadAll(&b)
+			out, err := io.ReadAll(&b)
 			if err != nil {
 				t.Fatal(err)
 			}

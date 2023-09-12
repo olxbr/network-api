@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -93,7 +93,7 @@ func TestPoolAddCommand(t *testing.T) {
 			log.SetOutput(&b)
 			cmd.SetArgs(tt.flags)
 			e := cmd.ExecuteContext(ctx)
-			out, err := ioutil.ReadAll(&b)
+			out, err := io.ReadAll(&b)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -142,7 +142,7 @@ func TestPoolListCommand(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	out, err := ioutil.ReadAll(&b)
+	out, err := io.ReadAll(&b)
 	if err != nil {
 		t.Fatal(err)
 	}

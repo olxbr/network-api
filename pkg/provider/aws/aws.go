@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -88,7 +88,7 @@ func LambdaHandler(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	dec64 := base64.NewDecoder(base64.StdEncoding, strings.NewReader(request.Body))
-	d, err := ioutil.ReadAll(dec64)
+	d, err := io.ReadAll(dec64)
 	if err != nil {
 		e := fmt.Errorf("error decoding base64: %s", err)
 		return apiGatewayError(e, 400), nil

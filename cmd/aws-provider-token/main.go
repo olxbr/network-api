@@ -8,7 +8,6 @@ import (
 	"log"
 	"math/rand"
 	"strings"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -17,10 +16,6 @@ import (
 )
 
 var letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 func randSeq(n int) string {
 	b := make([]byte, n)

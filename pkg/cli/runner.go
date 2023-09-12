@@ -4,11 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -59,7 +57,6 @@ func NewRunner() *Runner {
 }
 
 func (r *Runner) Run() {
-	rand.Seed(time.Now().UnixNano())
 	err := run(r.root)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Program aborted: %v\n", err)
