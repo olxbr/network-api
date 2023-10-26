@@ -18,7 +18,7 @@ require (
 	github.com/awslabs/aws-lambda-go-api-proxy v0.13.3
 	github.com/go-playground/validator/v10 v10.15.3
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/google/uuid v1.3.0
+	github.com/google/uuid v1.4.0
 	github.com/gorilla/mux v1.8.0
 	github.com/int128/oauth2cli v1.14.0
 	github.com/lestrrat-go/jwx v1.2.26
