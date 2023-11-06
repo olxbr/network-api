@@ -24,7 +24,7 @@ require (
 	github.com/lestrrat-go/jwx v1.2.26
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
-	github.com/spf13/cobra v1.4.1-0.20220620041121-7c9831d376a6
+	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	go4.org/netipx v0.0.0-20230824141953-6213f710f925
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
@@ -50,7 +50,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/int128/listener v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
