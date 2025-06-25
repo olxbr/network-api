@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/int128/oauth2cli"
 	"github.com/pkg/browser"
 	"golang.org/x/oauth2"
@@ -193,13 +193,22 @@ func (o *OAuth2Authorizer) SaveToCache(ctx context.Context, t *oauth2.Token) err
 
 func (o *OAuth2Authorizer) Valid(t string) (bool, error) {
 	p := new(jwt.Parser)
-	claims := jwt.StandardClaims{}
+	claims := jwt.RegisteredClaims{}
 	_, _, err := p.ParseUnverified(t, &claims)
 	if err != nil {
 		log.Printf("Something went wrong!")
 		return false, err
 	}
-	if !claims.VerifyExpiresAt(time.Now().Unix(), true) {
+	exp, err := claims.GetExpirationTime()
+	if err != nil {
+		log.Printf("Could not get expiration time: %v", err)
+		return false, err
+	}
+	if exp == nil {
+		log.Printf("No expiration time found in token claims")
+		return false, nil
+	}
+	if exp.Before(time.Now()) {
 		log.Printf("Expired!")
 		return false, nil
 	}

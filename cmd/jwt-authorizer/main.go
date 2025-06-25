@@ -11,7 +11,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/lestrrat-go/jwx/jwk"
 )
 
@@ -67,14 +67,23 @@ func handleAuthorization(ctx context.Context, event events.APIGatewayCustomAutho
 		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
 	}
 
-	if !claims.VerifyIssuer(issuer, true) {
+	claimIssuer, err := claims.GetIssuer()
+	if err != nil {
+		log.Printf("error getting issuer from claims: %+v", err)
+		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
+	}
+	if claimIssuer == "" {
+		log.Println("issuer not found in claims")
+		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
+	}
+	if issuer != claimIssuer {
 		log.Printf("issuer mismatch %s %s", issuer, claims.Issuer)
 		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
 	}
 
 	hasAudience := false
 	for _, a := range audience {
-		hasAudience = hasAudience || claims.VerifyAudience(a, true)
+		hasAudience = hasAudience || VerifyAudience(claims, a)
 	}
 
 	if !hasAudience {
@@ -93,12 +102,26 @@ func handleAuthorization(ctx context.Context, event events.APIGatewayCustomAutho
 	return authorization, nil
 }
 
+func VerifyAudience(claims JWTAuthorizerClaims, audience string) bool {
+	claimsAudience, err := claims.GetAudience()
+	if err != nil {
+		log.Printf("error getting audience from claims: %+v", err)
+		return false
+	}
+	for _, a := range claimsAudience {
+		if subtle.ConstantTimeCompare([]byte(a), []byte(audience)) != 0 {
+			return true
+		}
+	}
+	return false
+}
+
 type JWTAuthorizerClaims struct {
 	FirstName string `json:"given_name"`
 	LastName  string `json:"family_name"`
 	Email     string `json:"email"`
 	Scope     string `json:"scp,omitempty"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 func (c *JWTAuthorizerClaims) VerifyScope(scopes []string) (bool, []string) {
