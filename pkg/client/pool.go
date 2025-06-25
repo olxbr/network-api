@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/olxbr/network-api/pkg/types"
@@ -20,7 +21,11 @@ func (c *Client) ListPools(ctx context.Context) (*types.PoolListResponse, error)
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("error closing response body: %v", closeErr)
+		}
+	}()
 	d := json.NewDecoder(resp.Body)
 
 	p := &types.PoolListResponse{}
@@ -46,7 +51,11 @@ func (c *Client) CreatePool(ctx context.Context, r *types.PoolRequest) (*types.P
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("error closing response body: %v", closeErr)
+		}
+	}()
 
 	d := json.NewDecoder(resp.Body)
 	if resp.StatusCode != http.StatusCreated {

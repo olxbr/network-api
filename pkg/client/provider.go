@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/olxbr/network-api/pkg/types"
@@ -20,7 +21,11 @@ func (c *Client) ListProviders(ctx context.Context) (*types.ProviderListResponse
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("error closing response body: %v", closeErr)
+		}
+	}()
 	d := json.NewDecoder(resp.Body)
 
 	p := &types.ProviderListResponse{}
@@ -46,7 +51,11 @@ func (c *Client) CreateProvider(ctx context.Context, r *types.ProviderRequest) (
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("error closing response body: %v", closeErr)
+		}
+	}()
 
 	d := json.NewDecoder(resp.Body)
 	if resp.StatusCode != http.StatusCreated {
@@ -82,7 +91,11 @@ func (c *Client) UpdateProvider(ctx context.Context, name string, r *types.Provi
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("error closing response body: %v", closeErr)
+		}
+	}()
 
 	d := json.NewDecoder(resp.Body)
 	if resp.StatusCode != http.StatusOK {
@@ -112,7 +125,11 @@ func (c *Client) DeleteProvider(ctx context.Context, name string) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("error closing response body: %v", closeErr)
+		}
+	}()
 
 	d := json.NewDecoder(resp.Body)
 	if resp.StatusCode != http.StatusOK {

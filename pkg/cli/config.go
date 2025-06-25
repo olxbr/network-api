@@ -49,7 +49,11 @@ func LoadConfig() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not open file %s: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() {
+		if closeErr := f.Close(); closeErr != nil {
+			log.Printf("error closing file %s: %v", filename, closeErr)
+		}
+	}()
 	d := yaml.NewDecoder(f)
 	var c Config
 	if err := d.Decode(&c); err != nil {
@@ -83,7 +87,11 @@ func StatConfig(required bool) bool {
 			log.Printf("error creating file %s: %v", filename, err)
 			return false
 		}
-		defer f.Close()
+		defer func() {
+			if closeErr := f.Close(); closeErr != nil {
+				log.Printf("error closing file %s: %v", filename, closeErr)
+			}
+		}()
 		_, err = f.Write([]byte("\n"))
 		if err != nil {
 			log.Printf("error creating file %s: %v", filename, err)
@@ -100,7 +108,11 @@ func (c *Config) Save() error {
 	if err != nil {
 		return fmt.Errorf("could not open file %s: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() {
+		if closeErr := f.Close(); closeErr != nil {
+			log.Printf("error closing file %s: %v", filename, closeErr)
+		}
+	}()
 
 	e := yaml.NewEncoder(f)
 	if err := e.Encode(c); err != nil {

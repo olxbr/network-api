@@ -16,7 +16,6 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/int128/oauth2cli"
-	"github.com/int128/oauth2cli/oauth2params"
 	"github.com/pkg/browser"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
@@ -37,11 +36,7 @@ type OAuth2AuthorizerOptions struct {
 }
 
 func NewOAuth2Authorizer(o *OAuth2AuthorizerOptions) (*OAuth2Authorizer, error) {
-	pkce, err := oauth2params.NewPKCE()
-	if err != nil {
-		return nil, err
-	}
-
+	pkceVerifier := oauth2.GenerateVerifier()
 	ready := make(chan string, 1)
 	cfg := oauth2cli.Config{
 		OAuth2Config: oauth2.Config{
@@ -52,8 +47,8 @@ func NewOAuth2Authorizer(o *OAuth2AuthorizerOptions) (*OAuth2Authorizer, error) 
 			},
 			Scopes: append([]string{"openid"}, o.Scopes...),
 		},
-		AuthCodeOptions:      pkce.AuthCodeOptions(),
-		TokenRequestOptions:  pkce.TokenRequestOptions(),
+		AuthCodeOptions:      []oauth2.AuthCodeOption{oauth2.S256ChallengeOption(pkceVerifier)},
+		TokenRequestOptions:  []oauth2.AuthCodeOption{oauth2.VerifierOption(pkceVerifier)},
 		LocalServerReadyChan: ready,
 		Logf:                 log.Printf,
 	}
@@ -154,7 +149,11 @@ func (o *OAuth2Authorizer) GetFromCache(ctx context.Context) (*oauth2.Token, err
 	if err != nil {
 		return nil, fmt.Errorf("could not open file %s: %w", p, err)
 	}
-	defer f.Close()
+	defer func() {
+		if closeErr := f.Close(); closeErr != nil {
+			log.Printf("error closing file %s: %v", p, closeErr)
+		}
+	}()
 	d := json.NewDecoder(f)
 	var e entity
 	if err := d.Decode(&e); err != nil {
@@ -176,7 +175,11 @@ func (o *OAuth2Authorizer) SaveToCache(ctx context.Context, t *oauth2.Token) err
 	if err != nil {
 		return fmt.Errorf("could not open file %s: %w", p, err)
 	}
-	defer f.Close()
+	defer func() {
+		if closeErr := f.Close(); closeErr != nil {
+			log.Printf("error closing file %s: %v", p, closeErr)
+		}
+	}()
 	enc := json.NewEncoder(f)
 	e := entity{
 		AccessToken:  t.AccessToken,

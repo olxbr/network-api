@@ -12,14 +12,18 @@ import (
 
 func renderProviders(w io.Writer, ps *types.ProviderListResponse) {
 	table := tablewriter.NewWriter(w)
-	table.SetHeader([]string{"Provider", "URL"})
+	table.Header([]string{"Provider", "URL"})
 	for _, p := range ps.Items {
-		table.Append([]string{
+		if err := table.Append([]string{
 			p.Name,
 			p.WebhookURL,
-		})
+		}); err != nil {
+			log.Printf("error appending to table: %v", err)
+		}
 	}
-	table.Render()
+	if err := table.Render(); err != nil {
+		log.Printf("error rendering table: %v", err)
+	}
 }
 
 func newProviderCommand() *cobra.Command {

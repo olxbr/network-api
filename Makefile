@@ -1,7 +1,7 @@
 .PHONY: test build
 
 GOLANGLINT_INSTALLED_VERSION := $(shell golangci-lint version 2>/dev/null | sed -ne 's/.*version\ \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p')
-GOLANG_LINT_VERSION := 1.54.2
+GOLANG_LINT_VERSION := 2.1.6
 
 REPO := github.com/olxbr/network-api
 
@@ -21,7 +21,7 @@ lint:
 ifneq (${GOLANG_LINT_VERSION}, ${GOLANGLINT_INSTALLED_VERSION})
 	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v${GOLANG_LINT_VERSION}
 endif
-	golangci-lint run
+	$$(go env GOPATH)/bin/golangci-lint run
 
 build:
 	go build -o ./bin/network-api ${GO_LDFLAGS} ./cmd/network-api

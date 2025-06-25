@@ -145,17 +145,18 @@ func (d *Deployer) ExecuteChangeSet(ctx context.Context, stackName, ID string) e
 }
 
 func (d *Deployer) WaitExecute(ctx context.Context, stackName string, t cftypes.ChangeSetType) error {
-	if t == cftypes.ChangeSetTypeCreate {
+	switch t {
+	case cftypes.ChangeSetTypeCreate:
 		waiter := cloudformation.NewStackCreateCompleteWaiter(d.Client)
 		return waiter.Wait(ctx, &cloudformation.DescribeStacksInput{
 			StackName: aws.String(stackName),
 		}, 1*time.Minute)
-	} else if t == cftypes.ChangeSetTypeUpdate {
+	case cftypes.ChangeSetTypeUpdate:
 		waiter := cloudformation.NewStackUpdateCompleteWaiter(d.Client)
 		return waiter.Wait(ctx, &cloudformation.DescribeStacksInput{
 			StackName: aws.String(stackName),
 		}, 1*time.Minute)
+	default:
+		return fmt.Errorf("unsupported change set type: %s", t)
 	}
-
-	return fmt.Errorf("unsupported change set type: %s", t)
 }

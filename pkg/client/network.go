@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/olxbr/network-api/pkg/types"
@@ -20,7 +21,11 @@ func (c *Client) ListNetworks(ctx context.Context) (*types.NetworkListResponse, 
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("error closing response body: %v", closeErr)
+		}
+	}()
 	d := json.NewDecoder(resp.Body)
 	if resp.StatusCode != http.StatusOK {
 		e := &types.ErrorResponse{}
@@ -49,7 +54,11 @@ func (c *Client) DetailNetwork(ctx context.Context, id string) (*types.Network, 
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("error closing response body: %v", closeErr)
+		}
+	}()
 	d := json.NewDecoder(resp.Body)
 	if resp.StatusCode != http.StatusOK {
 		e := &types.ErrorResponse{}
@@ -82,7 +91,11 @@ func (c *Client) CreateNetwork(ctx context.Context, r *types.NetworkRequest) (*t
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("error closing response body: %v", closeErr)
+		}
+	}()
 
 	d := json.NewDecoder(resp.Body)
 	if resp.StatusCode != http.StatusCreated {

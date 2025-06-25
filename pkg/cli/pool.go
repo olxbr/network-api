@@ -13,7 +13,7 @@ import (
 
 func renderPools(w io.Writer, ps *types.PoolListResponse) {
 	table := tablewriter.NewWriter(w)
-	table.SetHeader([]string{"ID", "Name", "Region", "Range"})
+	table.Header([]string{"ID", "Name", "Region", "Range"})
 	for _, p := range ps.Items {
 		var r string
 		if p.SubnetMask != nil {
@@ -21,14 +21,18 @@ func renderPools(w io.Writer, ps *types.PoolListResponse) {
 		} else if p.SubnetMaxIP != nil {
 			r = fmt.Sprintf("%s - %s", p.SubnetIP, types.ToString(p.SubnetMaxIP))
 		}
-		table.Append([]string{
+		if err := table.Append([]string{
 			p.ID.String(),
 			p.Name,
 			p.Region,
 			r,
-		})
+		}); err != nil {
+			log.Printf("error appending to table: %v", err)
+		}
 	}
-	table.Render()
+	if err := table.Render(); err != nil {
+		log.Printf("error rendering table: %v", err)
+	}
 }
 
 func newPoolCommand() *cobra.Command {

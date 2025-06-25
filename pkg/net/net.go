@@ -66,11 +66,7 @@ func (nm *NetworkManager) AllocateNetwork(ctx context.Context, poolID string, su
 
 	newNet := netip.PrefixFrom(pn, subnetSize)
 
-	for {
-		if !ipset.OverlapsPrefix(newNet) {
-			break
-		}
-
+	for ipset.OverlapsPrefix(newNet) {
 		var valid bool
 		newNet, valid = NextSubnet(newNet, subnetSize)
 		if !valid {

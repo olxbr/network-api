@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/olxbr/network-api/pkg/types"
@@ -18,7 +19,11 @@ func (c *Client) Version(ctx context.Context) (*types.Version, error) {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			log.Printf("error closing response body: %v", closeErr)
+		}
+	}()
 	d := json.NewDecoder(resp.Body)
 
 	var v *types.Version

@@ -12,9 +12,9 @@ import (
 
 func renderNetworks(w io.Writer, ns *types.NetworkListResponse) {
 	table := tablewriter.NewWriter(w)
-	table.SetHeader([]string{"ID", "Provider", "Account", "Region", "Environment", "CIDR", "VpcID", "Info"})
+	table.Header([]string{"ID", "Provider", "Account", "Region", "Environment", "CIDR", "VpcID", "Info"})
 	for _, n := range ns.Items {
-		table.Append([]string{
+		if err := table.Append([]string{
 			n.ID.String(),
 			n.Provider,
 			n.Account,
@@ -23,9 +23,13 @@ func renderNetworks(w io.Writer, ns *types.NetworkListResponse) {
 			n.CIDR,
 			n.VpcID,
 			n.Info,
-		})
+		}); err != nil {
+			log.Printf("error appending to table: %v", err)
+		}
 	}
-	table.Render()
+	if err := table.Render(); err != nil {
+		log.Printf("error rendering table: %v", err)
+	}
 }
 
 func newNetworkCommand() *cobra.Command {

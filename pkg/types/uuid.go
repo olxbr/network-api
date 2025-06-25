@@ -1,7 +1,6 @@
 package types
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	dynatypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
 )
@@ -14,8 +13,8 @@ func NewUUID() *DynamoUUID {
 	return &DynamoUUID{uuid.New()}
 }
 
-func (u *DynamoUUID) UnmarshalDynamoDBAttributeValue(av types.AttributeValue) error {
-	avS, ok := av.(*types.AttributeValueMemberS)
+func (u *DynamoUUID) UnmarshalDynamoDBAttributeValue(av dynatypes.AttributeValue) error {
+	avS, ok := av.(*dynatypes.AttributeValueMemberS)
 	if !ok {
 		return nil
 	}
@@ -30,7 +29,7 @@ func (u *DynamoUUID) UnmarshalDynamoDBAttributeValue(av types.AttributeValue) er
 }
 
 func (u *DynamoUUID) MarshalDynamoDBAttributeValue() (dynatypes.AttributeValue, error) {
-	return &types.AttributeValueMemberS{
-		Value: u.UUID.String(),
+	return &dynatypes.AttributeValueMemberS{
+		Value: u.String(),
 	}, nil
 }
