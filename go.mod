@@ -22,7 +22,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/int128/oauth2cli v1.17.0
 	github.com/lestrrat-go/jwx v1.2.31
-	github.com/olekukonko/tablewriter v1.0.7
+	github.com/olekukonko/tablewriter v1.0.8
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
